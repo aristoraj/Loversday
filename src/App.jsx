@@ -416,7 +416,7 @@ const ReelPage = () => {
   // Start floating after 3 seconds
   useEffect(() => {
     if (reduceMotion) return;
-    const t = setTimeout(() => setStartFloat(true), 3000);
+    const t = setTimeout(() => setStartFloat(true), 10000);
     return () => clearTimeout(t);
   }, [reduceMotion]);
 
