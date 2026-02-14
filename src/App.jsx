@@ -334,63 +334,98 @@ const FrontPage = ({ onYes }) => {
 };
 
 
-// ================= REEL PAGE =================
+/ ================= GRID REEL PAGE =================
 const ReelPage = () => {
-  const [hearts, setHearts] = useState([]);
-
-  useEffect(() => {
-    setHearts(Array.from({ length: 25 }).map((_, i) => ({
-      id: i,
-      delay: random(0, 8)
-    })));
-  }, []);
+  const isMobile = useIsMobile();
 
   return (
     <div style={{
-      height: "100vh",
+      minHeight: "100vh",
       width: "100vw",
-      overflow: "hidden",
-      position: "relative",
+      padding: "20px",
+      boxSizing: "border-box",
       background: "#f6c1cc",
-      fontFamily: "sans-serif"
+      overflowY: "auto",
+      position: "relative"
     }}>
-      <div style={{ position: "absolute", inset: 0, zIndex: 2 }}>
-        {hearts.map(h => <Heart key={h.id} delay={h.delay} />)}
-      </div>
+      {/* Floating Hearts */}
+      {Array.from({ length: 20 }).map((_, i) => <Heart key={i} delay={random(0,8)} />)}
 
-      <div style={{ position: "absolute", inset: 0, zIndex: 3 }}>
-        {PHOTOS.map((p, i) => (
-          <FloatingPhoto key={i} src={p} laneIndex={i % LANES.length} delay={i * 1.5} />
-        ))}
-      </div>
-
-      <div style={{ position: "absolute", inset: 0, zIndex: 4 }}>
-        {QUOTES.map((q, i) => (
-          <FloatingQuote key={i} text={q} laneIndex={(i + 2) % LANES.length} delay={i * 2} />
-        ))}
-      </div>
-
-      {/* ===== STATIC LOVE TEXT ===== */}
-      <div style={{
-        position: "absolute",
-        top: "40px",
-        left: "50%",
-        transform: "translateX(-50%)",
-        width: "90%",
-        maxWidth: "500px",
-        textAlign: "center",
-        color: "white",
-        fontWeight: "bold",
-        fontSize: "clamp(16px, 4vw, 22px)",
-        lineHeight: 1.5,
-        textShadow: "0 0 20px rgba(255,50,120,0.9)",
-        zIndex: 1,
-        padding: "16px 18px",
-        borderRadius: "18px",
-        background: "rgba(255, 105, 140, 0.25)",
-        backdropFilter: "blur(6px)"
-      }}>
+      {/* Top Centered Message */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        style={{
+          position: "sticky",
+          top: "20px",
+          left: "50%",
+          transform: "translateX(-50%)",
+          maxWidth: "500px",
+          background: "rgba(255,105,140,0.22)",
+          backdropFilter: "blur(12px)",
+          borderRadius: "20px",
+          padding: "16px",
+          textAlign: "center",
+          color: "white",
+          fontWeight: 600,
+          fontSize: "clamp(13px,3.5vw,16px)",
+          lineHeight: 1.5,
+          textShadow: "0 0 15px rgba(255,50,120,0.9)",
+          zIndex: 10,
+          marginBottom: "20px"
+        }}
+      >
         {YES_MESSAGE}
+      </motion.div>
+
+      {/* Photos Grid with floating animation */}
+      <div style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(3,1fr)",
+        gap: isMobile ? "12px" : "20px",
+        marginBottom: "20px"
+      }}>
+        {PHOTOS.map((src,i) => (
+          <FloatingGridItem key={i} index={i}>
+            <img
+              src={src}
+              alt={`img-${i}`}
+              style={{
+                width: "100%",
+                aspectRatio: "0.75",
+                objectFit: "cover",
+                borderRadius: "16px",
+                boxShadow: "0 8px 32px rgba(255,0,80,0.3)"
+              }}
+            />
+          </FloatingGridItem>
+        ))}
+      </div>
+
+      {/* Quotes Grid with floating animation */}
+      <div style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(3,1fr)",
+        gap: isMobile ? "8px" : "16px"
+      }}>
+        {QUOTES.map((q,i) => (
+          <FloatingGridItem key={i} index={i}>
+            <div style={{
+              background: "rgba(255,255,255,0.15)",
+              backdropFilter: "blur(8px)",
+              padding: isMobile ? "6px 8px" : "8px 12px",
+              textAlign: "center",
+              color: "white",
+              fontWeight: 600,
+              fontSize: isMobile ? "12px" : "16px",
+              borderRadius: "12px",
+              textShadow: "0 0 8px rgba(255,100,150,0.9)"
+            }}>
+              {q}
+            </div>
+          </FloatingGridItem>
+        ))}
       </div>
     </div>
   );
