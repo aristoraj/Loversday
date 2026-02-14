@@ -166,7 +166,7 @@ const FrontPage = ({ onYes }) => {
   const [noPos, setNoPos] = useState({ x: 0, y: 0 });
 
   const moveNo = () => {
-    setNoPos({ x: random(-150, 150), y: random(-80, 80) });
+    setNoPos({ x: random(-100, 100), y: random(-50, 50) });
   };
 
   return (
@@ -176,73 +176,153 @@ const FrontPage = ({ onYes }) => {
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
-      background: "#f6c1cc",
+      background: "linear-gradient(135deg, #f6c1cc 0%, #ffd4e0 50%, #f6c1cc 100%)",
       position: "relative",
-      overflow: "hidden",
-      fontFamily: "sans-serif"
+      overflow: "hidden"
     }}>
       {Array.from({ length: 15 }).map((_, i) => (
         <motion.div
           key={i}
           initial={{ y: "110vh", opacity: 0 }}
-          animate={{ y: "-10vh", opacity: [0, 1, 1, 0] }}
-          transition={{ duration: random(6, 12), delay: i * 0.5, repeat: Infinity }}
-          style={{ position: "absolute", left: `${random(0, 100)}%`, fontSize: `${random(18, 32)}px` }}
+          animate={{ 
+            y: "-10vh", 
+            opacity: [0, 1, 1, 0],
+            rotate: [0, 360]
+          }}
+          transition={{ 
+            duration: random(7, 13), 
+            delay: i * 0.5, 
+            repeat: Infinity 
+          }}
+          style={{ 
+            position: "absolute", 
+            left: `${random(5, 95)}%`, 
+            fontSize: `${random(18, 30)}px`,
+            zIndex: 1
+          }}
         >
           ❤️
         </motion.div>
       ))}
 
       <motion.div
-        initial={{ scale: 0.8, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ duration: 0.8 }}
+        initial={{ scale: 0.7, opacity: 0, y: 20 }}
+        animate={{ scale: 1, opacity: 1, y: 0 }}
+        transition={{ 
+          duration: 1, 
+          type: "spring", 
+          stiffness: 100 
+        }}
         style={{
-          background: "#fff0f4",
-          padding: "40px",
-          borderRadius: "30px",
+          background: "linear-gradient(135deg, #fff0f4 0%, #ffe8f0 100%)",
+          padding: "32px 26px",
+          borderRadius: "28px",
           textAlign: "center",
-          boxShadow: "0 20px 60px rgba(0,0,0,0.15)"
+          boxShadow: "0 25px 70px rgba(255, 0, 80, 0.25), 0 10px 30px rgba(0, 0, 0, 0.1)",
+          maxWidth: "90vw",
+          width: "fit-content",
+          border: "3px solid rgba(255, 100, 150, 0.3)",
+          position: "relative",
+          zIndex: 10
         }}
       >
-        <img src={PHOTOS[0]} alt="thumbnail" style={{
-          width: "140px",
-          height: "180px",
-          objectFit: "cover",
-          borderRadius: "18px",
-          marginBottom: "20px",
-          boxShadow: "0 10px 30px rgba(0,0,0,0.2)"
-        }} />
+        <motion.img 
+          src={PHOTOS[0]} 
+          alt="thumb"
+          initial={{ scale: 0.8, rotate: -5 }}
+          animate={{ 
+            scale: 1, 
+            rotate: 0,
+            boxShadow: [
+              "0 10px 30px rgba(255, 0, 80, 0.3)",
+              "0 15px 40px rgba(255, 0, 80, 0.5)",
+              "0 10px 30px rgba(255, 0, 80, 0.3)"
+            ]
+          }}
+          transition={{ 
+            duration: 2,
+            repeat: Infinity,
+            repeatType: "reverse"
+          }}
+          style={{
+            width: "130px",
+            height: "170px",
+            objectFit: "cover",
+            borderRadius: "18px",
+            marginBottom: "18px",
+            border: "3px solid rgba(255, 100, 150, 0.4)"
+          }} 
+        />
 
-        <h2 style={{ color: "#ff4d88" }}>My dr Manje🐣😻,</h2>
-        <h1 style={{ color: "#333", marginBottom: 20 }}>
+        <h2 style={{ 
+          color: "#ff4d88", 
+          fontSize: "clamp(18px, 5vw, 24px)", 
+          margin: "0 0 12px 0",
+          textShadow: "0 2px 10px rgba(255, 77, 136, 0.3)"
+        }}>
+          My dr Manje🐣😻,
+        </h2>
+        <h1 style={{ 
+          color: "#333", 
+          marginBottom: 20,
+          fontSize: "clamp(22px, 6vw, 32px)",
+          fontWeight: 800
+        }}>
           Will you be my Valentine? 💖
         </h1>
 
-        <div style={{ display: "flex", gap: 20, justifyContent: "center" }}>
-          <button onClick={onYes} style={{
-            background: "#ff4d88",
-            color: "white",
-            border: "none",
-            padding: "14px 30px",
-            borderRadius: "14px",
-            fontSize: "18px",
-            cursor: "pointer"
-          }}>
-            YES
-          </button>
+        <div style={{ 
+          display: "flex", 
+          gap: 16, 
+          justifyContent: "center", 
+          flexWrap: "wrap" 
+        }}>
+          <motion.button 
+            onClick={onYes}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+            animate={{
+              boxShadow: [
+                "0 5px 20px rgba(255, 77, 136, 0.4)",
+                "0 8px 30px rgba(255, 77, 136, 0.7)",
+                "0 5px 20px rgba(255, 77, 136, 0.4)"
+              ]
+            }}
+            transition={{ 
+              duration: 1.5,
+              repeat: Infinity,
+              repeatType: "reverse"
+            }}
+            style={{
+              background: "linear-gradient(135deg, #ff4d88, #ff1f6f)",
+              color: "white",
+              border: "none",
+              padding: "14px 32px",
+              borderRadius: "14px",
+              fontSize: "clamp(16px, 4vw, 19px)",
+              cursor: "pointer",
+              minWidth: "90px",
+              fontWeight: 700,
+              textShadow: "0 2px 5px rgba(0, 0, 0, 0.3)"
+            }}
+          >
+            YES 💕
+          </motion.button>
 
           <motion.button
             onMouseEnter={moveNo}
+            onTouchStart={moveNo}
             animate={{ x: noPos.x, y: noPos.y }}
-            transition={{ type: "spring", stiffness: 200 }}
+            transition={{ type: "spring", stiffness: 300, damping: 15 }}
             style={{
               background: "#d0d0d0",
               border: "none",
-              padding: "14px 30px",
+              padding: "14px 32px",
               borderRadius: "14px",
-              fontSize: "18px",
-              cursor: "pointer"
+              fontSize: "clamp(16px, 4vw, 19px)",
+              cursor: "pointer",
+              minWidth: "90px",
+              fontWeight: 600
             }}
           >
             NO
@@ -252,6 +332,7 @@ const FrontPage = ({ onYes }) => {
     </div>
   );
 };
+
 
 // ================= REEL PAGE =================
 const ReelPage = () => {
