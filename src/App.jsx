@@ -444,29 +444,7 @@ const ReelPage = () => {
     };
   }, []);
 
-  // Dim images when the grid passes behind the message zone
-  useEffect(() => {
-    if (reduceMotion) return;
-
-    let raf = 0;
-    const tick = () => {
-      if (messageRef.current) {
-        const r = messageRef.current.getBoundingClientRect();
-        setMessageRect(r);
-
-        // Message zone: top area around the message box
-        // We'll dim more if the message box occupies more of the top viewport.
-        const zone = Math.min(1, Math.max(0, (r.bottom + 20) / window.innerHeight));
-        // zone typically ~0.25 to 0.45; convert to 0..1 dim factor
-        const d = Math.min(1, Math.max(0.35, zone)) - 0.35;
-        setDimStrength(Math.min(1, d * 2.2));
-      }
-      raf = requestAnimationFrame(tick);
-    };
-
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, [reduceMotion]);
+ 
 
   const duration = reduceMotion ? 0 : isMobile ? 22 : 28;
 
