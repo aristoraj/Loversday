@@ -141,11 +141,22 @@ import bgMusic from "./assets/music.mp3";
 
 // ================= PHOTOS =================
 const PHOTOS = [
-  img1,img2,img3,img4,img5,img6,img7,img8,img9,img10,
-  img11,img12,img13,img14,img15,img16,img17,img18,img19,img20,
-  img21,img22,img23,img24,img25,img26,img27,img28,img29,img30,
-  img31,img32,img33,img34,img35
+  img1, img35, img2, img3, img4, img5, img6, img7, img8, img9, img10,
+  img11, img12, img13, img14, img15, img16, img17, img18, img19, img20,
+  img21, img22, img23, img24, img25, img26, img27, img28, img29, img30,
+  img31, img32, img33, img34
 ];
+
+function shuffleArray(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
+
+const shuffledPhotos = shuffleArray([...PHOTOS]); // keeps original intact
+
 
 // ================= HELPERS =================
 const random = (min, max) => Math.random() * (max - min) + min;
@@ -334,7 +345,7 @@ const FrontPage = ({ onYes }) => {
         }}
       >
         <motion.img
-          src={PHOTOS[0]}
+          src={shuffledPhotos[0]}
           alt="thumb"
           initial={{ scale: 0.86, rotate: -4 }}
           animate={{
