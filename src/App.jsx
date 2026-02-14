@@ -334,7 +334,7 @@ const FrontPage = ({ onYes }) => {
 };
 
 
-/ ================= GRID REEL PAGE =================
+// ================= GRID REEL PAGE =================
 const ReelPage = () => {
   const isMobile = useIsMobile();
 
