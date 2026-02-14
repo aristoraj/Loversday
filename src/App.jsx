@@ -492,7 +492,7 @@ const ReelPage = () => {
         style={{
           position: "absolute",
           inset: 0,
-          zIndex: 5,
+          zIndex: 0,
           padding: isMobile ? "14px 12px" : "18px 20px",
           // Keep some space under message area (top)
           paddingTop: isMobile ? 150 : 130
