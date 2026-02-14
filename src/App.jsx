@@ -132,77 +132,48 @@ const Heart = ({ delay }) => (
 );
 
 // ================= FLOATING PHOTO =================
-const FloatingPhoto = ({ src, laneIndex, delay, lanes, isMobile }) => {
-  // Randomly choose a side to enter from: top, bottom, left, right
-  const side = ["top","bottom","left","right"][Math.floor(Math.random()*4)];
-  const initial = {
-    opacity: 0,
-    x: side === "left" ? "-20vw" : side === "right" ? "120vw" : 0,
-    y: side === "top" ? "-20vh" : side === "bottom" ? "120vh" : 0,
-    rotate: random(-20,20)
-  };
-  const animate = {
-    x: side === "left" || side === "right" ? random(10,90)+"vw" : undefined,
-    y: side === "top" || side === "bottom" ? random(10,90)+"vh" : undefined,
-    opacity: [0,1,1,0],
-    rotate: random(-15,15)
-  };
-
-  return (
-    <motion.img
-      src={src}
-      initial={initial}
-      animate={animate}
-      transition={{ duration: random(12,20), delay, repeat: Infinity, ease: "easeInOut" }}
-      style={{
-        position: "absolute",
-        width: isMobile ? "80px" : "120px",
-        height: isMobile ? "100px" : "160px",
-        objectFit: "cover",
-        borderRadius: "20px",
-        boxShadow: "0 0 30px rgba(255,0,80,0.4)",
-        pointerEvents: "none"
-      }}
-    />
-  );
-};
+const FloatingPhoto = ({ src, laneIndex, delay, lanes, isMobile }) => (
+  <motion.img
+    src={src}
+    initial={{ y: "110vh", opacity: 0 }}
+    animate={{ y: "-20vh", opacity: [0,1,1,0] }}
+    transition={{ duration: random(12,18), delay, repeat: Infinity, ease: "linear" }}
+    style={{
+      position: "absolute",
+      left: `${lanes[laneIndex] + random(-4,4)}%`,
+      transform: "translateX(-50%)",
+      width: isMobile ? "85px" : "120px",
+      height: isMobile ? "120px" : "160px",
+      objectFit: "cover",
+      borderRadius: "20px",
+      boxShadow: "0 0 30px rgba(255,0,80,0.4)",
+      pointerEvents: "none"
+    }}
+  />
+);
 
 // ================= FLOATING QUOTE =================
-const FloatingQuote = ({ text, laneIndex, delay, lanes, isMobile }) => {
-  const side = ["top","bottom","left","right"][Math.floor(Math.random()*4)];
-  const initial = {
-    opacity: 0,
-    x: side === "left" ? "-25vw" : side === "right" ? "125vw" : 0,
-    y: side === "top" ? "-20vh" : side === "bottom" ? "120vh" : 0,
-    rotate: random(-10,10)
-  };
-  const animate = {
-    x: side === "left" || side === "right" ? random(5,90)+"vw" : undefined,
-    y: side === "top" || side === "bottom" ? random(5,90)+"vh" : undefined,
-    opacity: [0,1,1,0],
-    rotate: random(-5,5)
-  };
-
-  return (
-    <motion.div
-      initial={initial}
-      animate={animate}
-      transition={{ duration: random(10,18), delay, repeat: Infinity, ease: "easeInOut" }}
-      style={{
-        position: "absolute",
-        maxWidth: isMobile ? "120px" : "180px",
-        textAlign: "center",
-        color: "white",
-        fontSize: isMobile ? "14px" : "18px",
-        fontWeight: 600,
-        textShadow: "0 0 15px rgba(255,100,150,0.9)",
-        pointerEvents: "none"
-      }}
-    >
-      {text}
-    </motion.div>
-  );
-};
+const FloatingQuote = ({ text, laneIndex, delay, lanes, isMobile }) => (
+  <motion.div
+    initial={{ y: "110vh", opacity: 0 }}
+    animate={{ y: "-20vh", opacity: [0,1,1,0] }}
+    transition={{ duration: random(10,16), delay, repeat: Infinity, ease: "linear" }}
+    style={{
+      position: "absolute",
+      left: `${lanes[laneIndex] + random(-3,3)}%`,
+      transform: "translateX(-50%)",
+      maxWidth: isMobile ? "120px" : "180px",
+      textAlign: "center",
+      color: "white",
+      fontSize: isMobile ? "14px" : "18px",
+      fontWeight: 600,
+      textShadow: "0 0 15px rgba(255,100,150,0.9)",
+      pointerEvents: "none"
+    }}
+  >
+    {text}
+  </motion.div>
+);
 
 // ================= FRONT PAGE =================
 const FrontPage = ({ onYes }) => {
