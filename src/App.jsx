@@ -74,8 +74,8 @@ const QUOTES = [
 const YES_MESSAGE = `Aww 😻 You said yes 🫣😍
 I love you so much dii en thangame 💋
 Chellame 💋 Kunje 💋 Pattu ma love you 💋
-Ammu kutty en bujjli 💋 alagi 😍 ladde umma dii 💋
-Kunje 🫂 en alagu pondati 💋💋👀
+Ammu kutty en bujjli 💋 alagi 😍 
+ladde umma dii 💋Kunje 🫂 en alagu pondati 💋💋👀
 
 No words to describe my love for you dii kunje 💯💋🫂
 Love you more and more dii 🤍🫰💃❤️
