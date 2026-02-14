@@ -223,7 +223,7 @@ const FloatingQuote = ({ text, laneIndex, delay, lanes, isMobile }) => {
         lineHeight: 1.4,
         textShadow: "0 0 15px rgba(255, 100, 150, 1), 0 2px 10px rgba(255, 0, 80, 0.8)",
         pointerEvents: "none",
-        zIndex: 4,
+        zIndex: 1,
         background: isMobile 
           ? "linear-gradient(135deg, rgba(255, 100, 150, 0.3), rgba(255, 50, 120, 0.25))"
           : "rgba(255, 255, 255, 0.08)",
@@ -483,7 +483,7 @@ const ReelPage = () => {
         style={{
           position: "absolute",
           top: "20px",
-          left: "50%",
+          left: "20%",
           transform: "translateX(-50%)",
           width: "92%",
           maxWidth: "520px",
@@ -495,7 +495,7 @@ const ReelPage = () => {
           fontSize: "clamp(13px, 3.5vw, 18px)",
           lineHeight: 1.6,
           textShadow: "0 0 20px rgba(255, 50, 120, 1), 0 3px 15px rgba(255, 0, 80, 0.9)",
-          zIndex: 10,
+          zIndex: 1,
           padding: "24px 22px",
           borderRadius: "24px",
           background: "linear-gradient(135deg, rgba(255, 105, 140, 0.35), rgba(255, 50, 120, 0.25))",
