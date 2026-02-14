@@ -576,9 +576,9 @@ const ReelPage = () => {
         style={{
           position: "absolute",
           top: 18,
-          left: "20%",
+          left: "5%",
           transform: "translateX(-50%)",
-          zIndex: 5,
+          zIndex: 1,
           width: "92%",
           maxWidth: "640px",
           pointerEvents: "none"
