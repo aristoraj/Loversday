@@ -345,7 +345,7 @@ const FrontPage = ({ onYes }) => {
         }}
       >
         <motion.img
-          src={shuffledPhotos[0]}
+          src={PHOTOS[0]}
           alt="thumb"
           initial={{ scale: 0.86, rotate: -4 }}
           animate={{
@@ -463,7 +463,7 @@ const ReelPage = () => {
   const [isPaused, setIsPaused] = useState(false);
 
   const items = useMemo(
-    () => PHOTOS.map((src, i) => ({ src, quote: QUOTES[i % QUOTES.length] })),
+    () => shuffledPhotos.map((src, i) => ({ src, quote: QUOTES[i % QUOTES.length] })),
     []
   );
 
