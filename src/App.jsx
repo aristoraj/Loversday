@@ -141,7 +141,10 @@ const Heart = ({ delay, reduceMotion, isMobile }) => (
 );
 
 // ================= PHOTO + QUOTE CARD =================
-const PhotoQuoteCard = ({ src, quote, i, reduceMotion }) => {
+const PhotoQuoteCard = ({ src, quote, i, reduceMotion, dimStrength = 0.0 }) => {
+  // dimStrength: 0..1 (higher => more dim)
+  const imgOpacity = Math.max(0.35, 1 - dimStrength * 0.65);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 10, scale: 0.98 }}
@@ -173,7 +176,10 @@ const PhotoQuoteCard = ({ src, quote, i, reduceMotion }) => {
           display: "block",
           width: "100%",
           aspectRatio: "3 / 4",
-          objectFit: "cover"
+          objectFit: "cover",
+          opacity: imgOpacity,
+          transition: "opacity 250ms ease",
+          filter: dimStrength > 0 ? "saturate(0.95)" : "none"
         }}
       />
 
@@ -381,21 +387,24 @@ const FrontPage = ({ onYes }) => {
   );
 };
 
-// ================= REEL PAGE (AUTO-FLOATING GRID, NO SCROLL) =================
+// ================= REEL PAGE (FLOAT FROM BOTTOM AFTER 3s, DIM NEAR MESSAGE) =================
 const ReelPage = () => {
   const [hearts, setHearts] = useState([]);
+  const [startFloat, setStartFloat] = useState(false);
+  const [dimStrength, setDimStrength] = useState(0); // 0..1
   const isMobile = useIsMobile();
   const reduceMotion = useReducedMotion();
 
-  // Pair every photo with a quote (loops quotes if photos > quotes)
   const items = useMemo(
     () => PHOTOS.map((src, i) => ({ src, quote: QUOTES[i % QUOTES.length] })),
     []
   );
 
-  // For seamless looping, we render the grid twice and translate upward
   const gridMeasureRef = useRef(null);
   const [loopHeight, setLoopHeight] = useState(1200);
+
+  const messageRef = useRef(null);
+  const [messageRect, setMessageRect] = useState(null);
 
   useEffect(() => {
     const count = isMobile ? 14 : 22;
@@ -404,19 +413,61 @@ const ReelPage = () => {
     );
   }, [isMobile]);
 
+  // Start floating after 3 seconds
   useEffect(() => {
-    const measure = () => {
+    if (reduceMotion) return;
+    const t = setTimeout(() => setStartFloat(true), 3000);
+    return () => clearTimeout(t);
+  }, [reduceMotion]);
+
+  useEffect(() => {
+    const measureLoop = () => {
       if (!gridMeasureRef.current) return;
       const h = gridMeasureRef.current.getBoundingClientRect().height;
       setLoopHeight(Math.max(600, Math.floor(h)));
     };
 
-    measure();
-    window.addEventListener("resize", measure);
-    return () => window.removeEventListener("resize", measure);
+    const measureMsg = () => {
+      if (!messageRef.current) return;
+      setMessageRect(messageRef.current.getBoundingClientRect());
+    };
+
+    measureLoop();
+    measureMsg();
+
+    window.addEventListener("resize", measureLoop);
+    window.addEventListener("resize", measureMsg);
+
+    return () => {
+      window.removeEventListener("resize", measureLoop);
+      window.removeEventListener("resize", measureMsg);
+    };
   }, []);
 
-  // Speed: adjust for mobile so it feels smooth
+  // Dim images when the grid passes behind the message zone
+  useEffect(() => {
+    if (reduceMotion) return;
+
+    let raf = 0;
+    const tick = () => {
+      if (messageRef.current) {
+        const r = messageRef.current.getBoundingClientRect();
+        setMessageRect(r);
+
+        // Message zone: top area around the message box
+        // We'll dim more if the message box occupies more of the top viewport.
+        const zone = Math.min(1, Math.max(0, (r.bottom + 20) / window.innerHeight));
+        // zone typically ~0.25 to 0.45; convert to 0..1 dim factor
+        const d = Math.min(1, Math.max(0.35, zone)) - 0.35;
+        setDimStrength(Math.min(1, d * 2.2));
+      }
+      raf = requestAnimationFrame(tick);
+    };
+
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [reduceMotion]);
+
   const duration = reduceMotion ? 0 : isMobile ? 22 : 28;
 
   return (
@@ -436,20 +487,32 @@ const ReelPage = () => {
         ))}
       </div>
 
-      {/* Floating grid layer (no scroll) */}
+      {/* Floating grid layer (starts after 3s, moves from bottom) */}
       <div
         style={{
           position: "absolute",
           inset: 0,
           zIndex: 5,
           padding: isMobile ? "14px 12px" : "18px 20px",
-          paddingTop: isMobile ? 140 : 120
+          // Keep some space under message area (top)
+          paddingTop: isMobile ? 150 : 130
         }}
       >
         <motion.div
-          animate={reduceMotion ? {} : { y: [0, -loopHeight] }}
+          initial={reduceMotion ? {} : { y: "100vh" }}
+          animate={
+            reduceMotion
+              ? {}
+              : startFloat
+              ? { y: [0, -loopHeight] }
+              : { y: "100vh" }
+          }
           transition={
-            reduceMotion ? {} : { duration, repeat: Infinity, ease: "linear" }
+            reduceMotion
+              ? {}
+              : startFloat
+              ? { duration, repeat: Infinity, ease: "linear" }
+              : { duration: 0.8, ease: "easeOut" }
           }
           style={{ willChange: "transform" }}
         >
@@ -472,6 +535,7 @@ const ReelPage = () => {
                   quote={it.quote}
                   i={i}
                   reduceMotion={reduceMotion}
+                  dimStrength={dimStrength}
                 />
               ))}
             </div>
@@ -497,32 +561,33 @@ const ReelPage = () => {
                 quote={it.quote}
                 i={i}
                 reduceMotion={reduceMotion}
+                dimStrength={dimStrength}
               />
             ))}
           </div>
         </motion.div>
       </div>
 
-      {/* YES message centered */}
+      {/* YES message (TOP center aligned) */}
       <motion.div
-        initial={{ opacity: 0, scale: 0.96 }}
-        animate={{ opacity: 1, scale: 1 }}
+        initial={{ opacity: 0, y: -10, scale: 0.98 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
         style={{
           position: "absolute",
-          inset: 0,
-          zIndex: 1,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
+          top: 18,
+          left: "50%",
+          transform: "translateX(-50%)",
+          zIndex: 10,
+          width: "92%",
+          maxWidth: "640px",
           pointerEvents: "none"
         }}
       >
         <div
+          ref={messageRef}
           style={{
-            width: "92%",
-            maxWidth: "620px",
-            maxHeight: isMobile ? "60vh" : "70vh",
+            maxHeight: isMobile ? "40vh" : "46vh",
             overflow: "auto",
             WebkitOverflowScrolling: "touch",
             textAlign: "center",
@@ -531,11 +596,11 @@ const ReelPage = () => {
             fontSize: "clamp(13px, 3.6vw, 18px)",
             lineHeight: 1.5,
             textShadow: "0 0 15px rgba(255,50,120,0.9)",
-            padding: isMobile ? "16px 16px" : "20px 20px",
+            padding: isMobile ? "14px 14px" : "18px 18px",
             borderRadius: 22,
-            background: "rgba(255, 105, 140, 0.26)",
+            background: "rgba(255, 105, 140, 0.30)",
             backdropFilter: "blur(12px)",
-            boxShadow: "0 12px 50px rgba(0,0,0,0.22)",
+            boxShadow: "0 12px 50px rgba(0,0,0,0.20)",
             border: "1px solid rgba(255,255,255,0.20)",
             pointerEvents: "auto"
           }}
