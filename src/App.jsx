@@ -395,6 +395,9 @@ const ReelPage = () => {
   const isMobile = useIsMobile();
   const reduceMotion = useReducedMotion();
 
+  // ✅ NEW: pause state (mobile only)
+  const [isPaused, setIsPaused] = useState(false);
+
   const items = useMemo(
     () => PHOTOS.map((src, i) => ({ src, quote: QUOTES[i % QUOTES.length] })),
     []
@@ -444,9 +447,11 @@ const ReelPage = () => {
     };
   }, []);
 
- 
-
   const duration = reduceMotion ? 0 : isMobile ? 22 : 28;
+
+  // ✅ NEW: pause helpers (only affect floating images)
+  const canAnimateFloat = !reduceMotion && startFloat && !(isMobile && isPaused);
+  const floatY = canAnimateFloat ? [0, -loopHeight] : 0;
 
   return (
     <div
@@ -465,6 +470,36 @@ const ReelPage = () => {
         ))}
       </div>
 
+      {/* ✅ NEW: Pause button (mobile only) */}
+      {isMobile && !reduceMotion && (
+        <div
+          style={{
+            position: "absolute",
+            top: 86,
+            right: 14,
+            zIndex: 999,
+            pointerEvents: "auto"
+          }}
+        >
+          <button
+            onClick={() => setIsPaused((p) => !p)}
+            style={{
+              border: "1px solid rgba(255,255,255,0.28)",
+              background: "rgba(255, 105, 140, 0.30)",
+              color: "white",
+              fontWeight: 800,
+              borderRadius: 14,
+              padding: "10px 12px",
+              backdropFilter: "blur(10px)",
+              boxShadow: "0 10px 30px rgba(0,0,0,0.18)",
+              cursor: "pointer"
+            }}
+          >
+            {isPaused ? "▶ Play" : "⏸ Pause"}
+          </button>
+        </div>
+      )}
+
       {/* Floating grid layer (starts after 3s, moves from bottom) */}
       <div
         style={{
@@ -478,18 +513,12 @@ const ReelPage = () => {
       >
         <motion.div
           initial={reduceMotion ? {} : { y: "100vh" }}
-          animate={
-            reduceMotion
-              ? {}
-              : startFloat
-              ? { y: [0, -loopHeight] }
-              : { y: "100vh" }
-          }
+          animate={reduceMotion ? {} : startFloat ? { y: floatY } : { y: "100vh" }}
           transition={
             reduceMotion
               ? {}
               : startFloat
-              ? { duration, repeat: Infinity, ease: "linear" }
+              ? { duration, repeat: canAnimateFloat ? Infinity : 0, ease: "linear" }
               : { duration: 0.8, ease: "easeOut" }
           }
           style={{ willChange: "transform" }}
