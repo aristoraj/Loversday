@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useRef, useMemo } from "react";
 import { motion, useReducedMotion } from "framer-motion";
-import { motion, useReducedMotion } from "framer-motion";
 import { useMotionValue, animate } from "framer-motion";
 
 // ================= IMAGE IMPORTS =================
