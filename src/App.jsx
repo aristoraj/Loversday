@@ -1,5 +1,7 @@
 import React, { useEffect, useState, useRef, useMemo } from "react";
 import { motion, useReducedMotion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
+import { useMotionValue, animate } from "framer-motion";
 
 // ================= IMAGE IMPORTS =================
 import img1 from "./assets/1.jpg";
@@ -439,7 +441,7 @@ const FrontPage = ({ onYes }) => {
   );
 };
 
-// ================= REEL PAGE (FLOAT FROM BOTTOM AFTER 3s, DIM NEAR MESSAGE) =================
+// ================= REEL PAGE (TRUE PAUSE ON TAP) =================
 const ReelPage = () => {
   const [hearts, setHearts] = useState([]);
   const [startFloat, setStartFloat] = useState(false);
@@ -457,7 +459,6 @@ const ReelPage = () => {
 
   const gridMeasureRef = useRef(null);
   const [loopHeight, setLoopHeight] = useState(1200);
-
   const messageRef = useRef(null);
 
   useEffect(() => {
@@ -474,7 +475,7 @@ const ReelPage = () => {
     return () => clearTimeout(t);
   }, [reduceMotion]);
 
-  // Measure loop height (useLayoutEffect-like timing)
+  // Measure loop height
   useEffect(() => {
     let raf1 = 0;
     let raf2 = 0;
@@ -485,7 +486,6 @@ const ReelPage = () => {
       setLoopHeight(Math.max(600, Math.floor(h)));
     };
 
-    // measure after paint (helps avoid "stuck" when images load late)
     raf1 = requestAnimationFrame(() => {
       measure();
       raf2 = requestAnimationFrame(measure);
@@ -499,7 +499,6 @@ const ReelPage = () => {
 
     window.addEventListener("resize", onResize);
 
-    // re-measure once images are loaded (more stable looping)
     const imgs = gridMeasureRef.current?.querySelectorAll?.("img") || [];
     imgs.forEach((img) => {
       if (!img) return;
@@ -514,29 +513,90 @@ const ReelPage = () => {
     };
   }, [isMobile]);
 
-  // ✅ Slower + smoother float (less jank)
-  // - increased duration
-  // - use ease: "linear" (already) and force GPU transform
   const duration = reduceMotion ? 0 : isMobile ? 34 : 44;
 
-  // ✅ pause helpers (only affect floating images)
-  const canAnimateFloat = !reduceMotion && startFloat && !(isMobile && isPaused);
-  const floatY = canAnimateFloat ? [0, -loopHeight] : 0;
+  // ✅ TRUE pause implementation (freeze current y)
+  const y = useMotionValue(0);
+  const floatAnimRef = useRef(null);
+  const entranceDoneRef = useRef(false);
 
-  // ✅ screen tap to pause/play (mobile only) — same as old pause button action
+  const stopFloat = () => {
+    if (floatAnimRef.current) {
+      floatAnimRef.current.stop();
+      floatAnimRef.current = null;
+    }
+  };
+
+  const startLoopFromCurrent = () => {
+    stopFloat();
+    const current = y.get();
+    floatAnimRef.current = animate(y, current - loopHeight, {
+      duration,
+      ease: "linear",
+      repeat: Infinity,
+      repeatType: "loop"
+    });
+  };
+
+  // set initial offscreen position
+  useEffect(() => {
+    if (reduceMotion) {
+      y.set(0);
+      return;
+    }
+    if (!entranceDoneRef.current) {
+      y.set(window.innerHeight || 900); // "100vh" equivalent
+    }
+  }, [reduceMotion, y]);
+
+  // entrance + looping
+  useEffect(() => {
+    if (reduceMotion) return;
+
+    if (!startFloat) {
+      stopFloat();
+      return;
+    }
+
+    // if paused, do nothing (freeze)
+    if (isMobile && isPaused) {
+      stopFloat();
+      return;
+    }
+
+    // first time: animate from bottom to 0, then loop
+    if (!entranceDoneRef.current) {
+      stopFloat();
+      const entrance = animate(y, 0, { duration: 0.9, ease: "easeOut" });
+      entrance.then(() => {
+        entranceDoneRef.current = true;
+        startLoopFromCurrent();
+      });
+      return () => entrance.stop?.();
+    }
+
+    // resume / restart loop when loopHeight changes
+    startLoopFromCurrent();
+
+    return () => stopFloat();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [startFloat, isPaused, loopHeight, duration, isMobile, reduceMotion]);
+
+  // ✅ tap anywhere to pause/play (mobile only)
   const handleScreenTogglePause = () => {
     if (isMobile && !reduceMotion) setIsPaused((p) => !p);
   };
 
   return (
     <div
-      onClick={handleScreenTogglePause}
+      onPointerDown={handleScreenTogglePause}
       style={{
         height: "100vh",
         width: "100vw",
         overflow: "hidden",
         position: "relative",
-        background: "#f6c1cc"
+        background: "#f6c1cc",
+        touchAction: "manipulation"
       }}
     >
       {/* Hearts background */}
@@ -557,23 +617,10 @@ const ReelPage = () => {
         }}
       >
         <motion.div
-          initial={reduceMotion ? {} : { y: "100vh" }}
-          animate={reduceMotion ? {} : startFloat ? { y: floatY } : { y: "100vh" }}
-          transition={
-            reduceMotion
-              ? {}
-              : startFloat
-              ? {
-                  duration,
-                  repeat: canAnimateFloat ? Infinity : 0,
-                  ease: "linear",
-                  repeatType: "loop"
-                }
-              : { duration: 0.9, ease: "easeOut" }
-          }
           style={{
+            y, // ✅ motionValue controls position
             willChange: "transform",
-            transform: "translateZ(0)", // GPU hint
+            transform: "translateZ(0)",
             backfaceVisibility: "hidden"
           }}
         >
@@ -639,17 +686,17 @@ const ReelPage = () => {
           top: 18,
           left: "5%",
           transform: "translateX(-50%)",
-          zIndex: 1, // make sure it's above grid
+          zIndex: 1,
           width: "92%",
           maxWidth: "640px",
-          pointerEvents: "auto" // ✅ allow clicking inside
+          pointerEvents: "auto"
         }}
+        onPointerDown={(e) => e.stopPropagation()} // ✅ prevent tap-pausing when interacting here
       >
-        {/* Container */}
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          {/* Scrollable message box */}
           <div
             ref={messageRef}
+            onPointerDown={(e) => e.stopPropagation()} // ✅ allow scroll without toggling pause
             style={{
               maxHeight: isMobile ? "100vh" : "46vh",
               overflow: "auto",
@@ -670,8 +717,6 @@ const ReelPage = () => {
           >
             <div style={{ whiteSpace: "pre-wrap" }}>{YES_MESSAGE}</div>
           </div>
-
-          {/* ✅ Pause button removed (screen tap handles pause/play) */}
         </div>
       </motion.div>
     </div>
