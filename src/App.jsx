@@ -395,7 +395,7 @@ const ReelPage = () => {
   const isMobile = useIsMobile();
   const reduceMotion = useReducedMotion();
 
-  // ✅ NEW: pause state (mobile only)
+  // ✅ pause state (mobile only)
   const [isPaused, setIsPaused] = useState(false);
 
   const items = useMemo(
@@ -407,7 +407,6 @@ const ReelPage = () => {
   const [loopHeight, setLoopHeight] = useState(1200);
 
   const messageRef = useRef(null);
-  const [messageRect, setMessageRect] = useState(null);
 
   useEffect(() => {
     const count = isMobile ? 14 : 22;
@@ -416,40 +415,59 @@ const ReelPage = () => {
     );
   }, [isMobile]);
 
-  // Start floating after 3 seconds
+  // Start floating after 10 seconds
   useEffect(() => {
     if (reduceMotion) return;
     const t = setTimeout(() => setStartFloat(true), 10000);
     return () => clearTimeout(t);
   }, [reduceMotion]);
 
+  // Measure loop height (useLayoutEffect-like timing)
   useEffect(() => {
-    const measureLoop = () => {
+    let raf1 = 0;
+    let raf2 = 0;
+
+    const measure = () => {
       if (!gridMeasureRef.current) return;
       const h = gridMeasureRef.current.getBoundingClientRect().height;
       setLoopHeight(Math.max(600, Math.floor(h)));
     };
 
-    const measureMsg = () => {
-      if (!messageRef.current) return;
-      setMessageRect(messageRef.current.getBoundingClientRect());
+    // measure after paint (helps avoid "stuck" when images load late)
+    raf1 = requestAnimationFrame(() => {
+      measure();
+      raf2 = requestAnimationFrame(measure);
+    });
+
+    const onResize = () => {
+      cancelAnimationFrame(raf1);
+      cancelAnimationFrame(raf2);
+      raf1 = requestAnimationFrame(measure);
     };
 
-    measureLoop();
-    measureMsg();
+    window.addEventListener("resize", onResize);
 
-    window.addEventListener("resize", measureLoop);
-    window.addEventListener("resize", measureMsg);
+    // re-measure once images are loaded (more stable looping)
+    const imgs = gridMeasureRef.current?.querySelectorAll?.("img") || [];
+    imgs.forEach((img) => {
+      if (!img) return;
+      img.addEventListener("load", onResize, { once: true });
+    });
 
     return () => {
-      window.removeEventListener("resize", measureLoop);
-      window.removeEventListener("resize", measureMsg);
+      window.removeEventListener("resize", onResize);
+      cancelAnimationFrame(raf1);
+      cancelAnimationFrame(raf2);
+      imgs.forEach((img) => img?.removeEventListener?.("load", onResize));
     };
-  }, []);
+  }, [isMobile]);
 
-  const duration = reduceMotion ? 0 : isMobile ? 22 : 28;
+  // ✅ Slower + smoother float (less jank)
+  // - increased duration
+  // - use ease: "linear" (already) and force GPU transform
+  const duration = reduceMotion ? 0 : isMobile ? 34 : 44;
 
-  // ✅ NEW: pause helpers (only affect floating images)
+  // ✅ pause helpers (only affect floating images)
   const canAnimateFloat = !reduceMotion && startFloat && !(isMobile && isPaused);
   const floatY = canAnimateFloat ? [0, -loopHeight] : 0;
 
@@ -470,44 +488,13 @@ const ReelPage = () => {
         ))}
       </div>
 
-      {/* ✅ NEW: Pause button (mobile only) */}
-      {isMobile && !reduceMotion && (
-        <div
-          style={{
-            position: "absolute",
-            top: 90,
-            right: 14,
-            zIndex: 999,
-            pointerEvents: "auto"
-          }}
-        >
-          <button
-            onClick={() => setIsPaused((p) => !p)}
-            style={{
-              border: "1px solid rgba(255,255,255,0.28)",
-              background: "rgba(255, 105, 140, 0.30)",
-              color: "white",
-              fontWeight: 800,
-              borderRadius: 14,
-              padding: "10px 12px",
-              backdropFilter: "blur(10px)",
-              boxShadow: "0 10px 30px rgba(0,0,0,0.18)",
-              cursor: "pointer"
-            }}
-          >
-            {isPaused ? "▶ Play" : "⏸ Pause"}
-          </button>
-        </div>
-      )}
-
-      {/* Floating grid layer (starts after 3s, moves from bottom) */}
+      {/* Floating grid layer */}
       <div
         style={{
           position: "absolute",
           inset: 0,
           zIndex: 10,
           padding: isMobile ? "14px 12px" : "18px 20px",
-          // Keep some space under message area (top)
           paddingTop: isMobile ? 150 : 130
         }}
       >
@@ -518,10 +505,19 @@ const ReelPage = () => {
             reduceMotion
               ? {}
               : startFloat
-              ? { duration, repeat: canAnimateFloat ? Infinity : 0, ease: "linear" }
-              : { duration: 0.8, ease: "easeOut" }
+              ? {
+                  duration,
+                  repeat: canAnimateFloat ? Infinity : 0,
+                  ease: "linear",
+                  repeatType: "loop"
+                }
+              : { duration: 0.9, ease: "easeOut" }
           }
-          style={{ willChange: "transform" }}
+          style={{
+            willChange: "transform",
+            transform: "translateZ(0)", // GPU hint
+            backfaceVisibility: "hidden"
+          }}
         >
           {/* FIRST GRID (measured) */}
           <div ref={gridMeasureRef}>
@@ -613,6 +609,28 @@ const ReelPage = () => {
           }}
         >
           <div style={{ whiteSpace: "pre-wrap" }}>{YES_MESSAGE}</div>
+
+          {/* ✅ Pause button BELOW the YES message (mobile only) */}
+          {isMobile && !reduceMotion && (
+            <div style={{ marginTop: 12, display: "flex", justifyContent: "center" }}>
+              <button
+                onClick={() => setIsPaused((p) => !p)}
+                style={{
+                  border: "1px solid rgba(255,255,255,0.28)",
+                  background: "rgba(255, 105, 140, 0.30)",
+                  color: "white",
+                  fontWeight: 800,
+                  borderRadius: 14,
+                  padding: "10px 14px",
+                  backdropFilter: "blur(10px)",
+                  boxShadow: "0 10px 30px rgba(0,0,0,0.18)",
+                  cursor: "pointer"
+                }}
+              >
+                {isPaused ? "▶ Play" : "⏸ Pause"}
+              </button>
+            </div>
+          )}
         </div>
       </motion.div>
     </div>
