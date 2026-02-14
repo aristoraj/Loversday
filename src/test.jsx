@@ -38,8 +38,6 @@ import img33 from "./assets/33.jpg";
 import img34 from "./assets/34.jpg";
 import img35 from "./assets/35.jpg";
 
-import bgMusic from "./assets/music.mp3";
-
 // ================= CONFIG =================
 const QUOTES = [
   "You are my sunshine",
@@ -72,6 +70,7 @@ const QUOTES = [
   "You are my always"
 ];
 
+// ================= YES MESSAGE =================
 const YES_MESSAGE = `Aww 😻 You said yes 🫣😍
 I love you so much dii en thangame 💋
 Chellame 💋 Kunje 💋 Pattu ma love you 💋
@@ -85,6 +84,9 @@ My life became more beautiful since the day you entered my life 💯🫂🤍
 Love you forever dii my dr alagu pondatiiiiii 💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋
 Happy Valantine's day dii Thangame🤍🫰💃❤️`;
 
+import bgMusic from "./assets/music.mp3";
+
+// ================= PHOTOS =================
 const PHOTOS = [
   img1,img2,img3,img4,img5,img6,img7,img8,img9,img10,
   img11,img12,img13,img14,img15,img16,img17,img18,img19,img20,
@@ -95,13 +97,21 @@ const PHOTOS = [
 // ================= HELPERS =================
 const random = (min, max) => Math.random() * (max - min) + min;
 
+// ================= RESPONSIVE LANES =================
+// Increased gaps for mobile to prevent overlap
+const DESKTOP_LANES = [10, 30, 50, 70, 90];
+const MOBILE_LANES_PHOTO = [15, 45, 75]; // Better spacing with more gap
+const MOBILE_LANES_TEXT = [5, 50, 95];   // Text lanes with safe margins
+
 const useIsMobile = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
   useEffect(() => {
     const resize = () => setIsMobile(window.innerWidth < 768);
     window.addEventListener("resize", resize);
     return () => window.removeEventListener("resize", resize);
   }, []);
+
   return isMobile;
 };
 
@@ -114,7 +124,7 @@ const Heart = ({ delay }) => (
     style={{
       position: "absolute",
       left: `${random(0,100)}%`,
-      fontSize: `${random(16,28)}px`,
+      fontSize: `${random(16,28)}px`, // Slightly smaller hearts for mobile safety
       pointerEvents: "none",
       zIndex: 1
     }}
@@ -124,29 +134,31 @@ const Heart = ({ delay }) => (
 );
 
 // ================= FLOATING PHOTO =================
-const FloatingPhoto = ({ src, index, isMobile }) => {
-  // Random direction from top, bottom, left, right
-  const dir = Math.floor(random(0,4));
-  const initialPos = {
-    x: dir === 1 ? random(-20,120) : 50,
-    y: dir === 0 ? 110 : dir === 2 ? -20 : random(-20,120)
-  };
-  const finalPos = {
-    x: dir === 3 ? random(-20,120) : 50,
-    y: dir === 1 ? -20 : dir === 0 ? 110 : 50
-  };
-
+const FloatingPhoto = ({ src, laneIndex, delay, lanes, isMobile }) => {
+  const safeLeft = lanes[laneIndex];
+  const mobileOffset = isMobile ? random(-2,2) : random(-4,4); // Reduced random offset for mobile
+  
   return (
     <motion.img
       src={src}
-      initial={{ x: `${initialPos.x}%`, y: `${initialPos.y}vh`, opacity: 0 }}
-      animate={{ x: `${finalPos.x}%`, y: `${finalPos.y}vh`, opacity: [0,1,1,0] }}
-      transition={{ duration: random(12,20), delay: index*0.5, repeat: Infinity, ease: "easeInOut" }}
+      initial={{ y: "110vh", opacity: 0 }}
+      animate={{ 
+        y: "-15vh", // Slightly less travel to stay in viewport
+        opacity: [0,1,1,0] 
+      }}
+      transition={{ 
+        duration: random(14,20), // Slightly slower for smoother mobile
+        delay, 
+        repeat: Infinity, 
+        ease: "easeInOut" // Smoother easing
+      }}
       style={{
         position: "absolute",
+        left: `${safeLeft + mobileOffset}%`,
         transform: "translateX(-50%)",
-        width: isMobile ? "90px" : "140px",
+        width: isMobile ? "85px" : "140px", // Smaller images for mobile
         height: isMobile ? "120px" : "175px",
+        maxWidth: isMobile ? "90vw" : "none",
         objectFit: "cover",
         borderRadius: "16px",
         boxShadow: "0 8px 32px rgba(255,0,80,0.3)",
@@ -158,38 +170,54 @@ const FloatingPhoto = ({ src, index, isMobile }) => {
 };
 
 // ================= FLOATING QUOTE =================
-const FloatingQuote = ({ text, index, isMobile }) => (
-  <motion.div
-    initial={{ y: "110vh", opacity: 0 }}
-    animate={{ y: "-15vh", opacity: [0,1,1,0] }}
-    transition={{ duration: random(12,18), delay: index*0.6, repeat: Infinity, ease: "easeInOut" }}
-    style={{
-      position: "absolute",
-      left: `${random(5,95)}%`,
-      transform: "translateX(-50%)",
-      maxWidth: isMobile ? "100px" : "160px",
-      padding: isMobile ? "4px 8px" : "6px 12px",
-      textAlign: "center",
-      color: "white",
-      fontSize: isMobile ? "12px" : "16px",
-      fontWeight: 600,
-      lineHeight: 1.3,
-      textShadow: "0 0 12px rgba(255,100,150,0.9)",
-      pointerEvents: "none",
-      zIndex: 4,
-      background: isMobile ? "rgba(255,255,255,0.15)" : "transparent",
-      borderRadius: "8px",
-      backdropFilter: "blur(8px)"
-    }}
-  >
-    {text}
-  </motion.div>
-);
+const FloatingQuote = ({ text, laneIndex, delay, lanes, isMobile }) => {
+  const safeLeft = lanes[laneIndex];
+  const mobileOffset = isMobile ? random(-1,1) : random(-3,3); // Minimal offset for mobile
+  
+  return (
+    <motion.div
+      initial={{ y: "110vh", opacity: 0 }}
+      animate={{ 
+        y: "-15vh", // Same travel distance as photos
+        opacity: [0,1,1,0] 
+      }}
+      transition={{ 
+        duration: random(12,18), // Synchronized timing range
+        delay, 
+        repeat: Infinity, 
+        ease: "easeInOut" 
+      }}
+      style={{
+        position: "absolute",
+        left: `${safeLeft + mobileOffset}%`,
+        transform: "translateX(-50%)",
+        maxWidth: isMobile ? "100px" : "160px", // Much smaller for mobile
+        padding: isMobile ? "4px 8px" : "6px 12px",
+        textAlign: "center",
+        color: "white",
+        fontSize: isMobile ? "12px" : "16px", // Smaller font for mobile
+        fontWeight: 600,
+        lineHeight: 1.3,
+        textShadow: "0 0 12px rgba(255,100,150,0.9)",
+        pointerEvents: "none",
+        zIndex: 4,
+        background: isMobile ? "rgba(255,255,255,0.15)" : "transparent",
+        borderRadius: "8px",
+        backdropFilter: "blur(8px)"
+      }}
+    >
+      {text}
+    </motion.div>
+  );
+};
 
 // ================= FRONT PAGE =================
 const FrontPage = ({ onYes }) => {
   const [noPos, setNoPos] = useState({ x: 0, y: 0 });
-  const moveNo = () => setNoPos({ x: random(-120,120), y: random(-60,60) });
+
+  const moveNo = () => {
+    setNoPos({ x: random(-120,120), y: random(-60,60) }); // Reduced movement range
+  };
 
   return (
     <div style={{
@@ -202,14 +230,30 @@ const FrontPage = ({ onYes }) => {
       position: "relative",
       overflow: "hidden"
     }}>
-      {Array.from({ length: 12 }).map((_, i) => <Heart key={i} delay={i*0.6} />)}
+      {Array.from({ length: 12 }).map((_, i) => ( // Reduced hearts for mobile performance
+        <motion.div
+          key={i}
+          initial={{ y: "110vh", opacity: 0 }}
+          animate={{ y: "-10vh", opacity: [0,1,1,0] }}
+          transition={{ duration: random(6,12), delay: i * 0.6, repeat: Infinity }}
+          style={{ 
+            position: "absolute", 
+            left: `${random(0,100)}%`, 
+            fontSize: `${random(16,26)}px`,
+            zIndex: 1
+          }}
+        >
+          ❤️
+        </motion.div>
+      ))}
+
       <motion.div
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 0.8 }}
         style={{
           background: "#fff0f4",
-          padding: "30px 24px",
+          padding: "30px 24px", // Responsive padding
           borderRadius: "24px",
           textAlign: "center",
           boxShadow: "0 20px 60px rgba(0,0,0,0.15)",
@@ -221,17 +265,22 @@ const FrontPage = ({ onYes }) => {
           src={PHOTOS[0]} 
           alt="thumb" 
           style={{
-            width: "120px",
+            width: "120px", // Smaller thumb
             height: "160px",
             objectFit: "cover",
             borderRadius: "16px",
             marginBottom: "16px"
           }} 
         />
+
         <h2 style={{ color: "#ff4d88", fontSize: "clamp(18px, 5vw, 24px)", margin: "0 0 12px 0" }}>
           My dr Manje🐣😻,
         </h2>
-        <h1 style={{ color: "#333", marginBottom: 16, fontSize: "clamp(22px, 6vw, 32px)" }}>
+        <h1 style={{ 
+          color: "#333", 
+          marginBottom: 16,
+          fontSize: "clamp(22px, 6vw, 32px)"
+        }}>
           Will you be my Valentine? 💖
         </h1>
 
@@ -245,7 +294,9 @@ const FrontPage = ({ onYes }) => {
             fontSize: "clamp(16px, 4vw, 18px)",
             cursor: "pointer",
             minWidth: "80px"
-          }}>YES</button>
+          }}>
+            YES
+          </button>
 
           <motion.button
             onMouseEnter={moveNo}
@@ -260,7 +311,9 @@ const FrontPage = ({ onYes }) => {
               cursor: "pointer",
               minWidth: "80px"
             }}
-          >NO</motion.button>
+          >
+            NO
+          </motion.button>
         </div>
       </motion.div>
     </div>
@@ -269,26 +322,61 @@ const FrontPage = ({ onYes }) => {
 
 // ================= REEL PAGE =================
 const ReelPage = () => {
+  const [hearts, setHearts] = useState([]);
   const isMobile = useIsMobile();
+
+  const photoLanes = isMobile ? MOBILE_LANES_PHOTO : DESKTOP_LANES;
+  const textLanes = isMobile ? MOBILE_LANES_TEXT : DESKTOP_LANES;
+
+  useEffect(() => {
+    setHearts(Array.from({ length: 20 }).map((_, i) => ({ // Reduced for mobile
+      id: i,
+      delay: random(0,8)
+    })));
+  }, []);
 
   return (
     <div style={{
       height: "100vh",
       width: "100vw",
-      overflow: "auto",
+      overflow: "hidden",
       position: "relative",
       background: "#f6c1cc"
     }}>
-      {/* Hearts */}
-      {Array.from({ length: 20 }).map((_, i) => <Heart key={i} delay={random(0,8)} />)}
+      {/* Hearts layer */}
+      <div style={{ position: "absolute", inset: 0, zIndex: 2 }}>
+        {hearts.map(h => <Heart key={h.id} delay={h.delay} />)}
+      </div>
 
-      {/* Floating Photos */}
-      {PHOTOS.map((p,i) => <FloatingPhoto key={i} src={p} index={i} isMobile={isMobile} />)}
+      {/* Photos layer */}
+      <div style={{ position: "absolute", inset: 0, zIndex: 3 }}>
+        {PHOTOS.map((p, i) => (
+          <FloatingPhoto
+            key={i}
+            src={p}
+            laneIndex={i % photoLanes.length}
+            delay={i * 1.8}
+            lanes={photoLanes}
+            isMobile={isMobile}
+          />
+        ))}
+      </div>
 
-      {/* Floating Quotes */}
-      {QUOTES.map((q,i) => <FloatingQuote key={i} text={q} index={i} isMobile={isMobile} />)}
+      {/* Quotes layer */}
+      <div style={{ position: "absolute", inset: 0, zIndex: 4 }}>
+        {QUOTES.map((q, i) => (
+          <FloatingQuote
+            key={i}
+            text={q}
+            laneIndex={(i + 1) % textLanes.length}
+            delay={i * 2.4}
+            lanes={textLanes}
+            isMobile={isMobile}
+          />
+        ))}
+      </div>
 
-      {/* YES MESSAGE Overlay */}
+      {/* Message overlay - mobile friendly */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -305,51 +393,19 @@ const ReelPage = () => {
           textAlign: "center",
           color: "white",
           fontWeight: "600",
-          fontSize: "clamp(13px,3.5vw,18px)",
+          fontSize: "clamp(13px, 3.5vw, 18px)",
           lineHeight: 1.5,
           textShadow: "0 0 15px rgba(255,50,120,0.9)",
           zIndex: 10,
-          padding: "20px",
+          padding: "20px 20px",
           borderRadius: "20px",
           background: "rgba(255, 105, 140, 0.22)",
           backdropFilter: "blur(12px)",
           boxShadow: "0 10px 40px rgba(0,0,0,0.2)"
         }}
       >
-        {YES_MESSAGE}
+        <div>{YES_MESSAGE}</div>
       </motion.div>
-
-      {/* Scrollable Grid Section */}
-      <div style={{
-        position: "relative",
-        zIndex: 0,
-        marginTop: "80vh",
-        padding: "20px",
-        display: "grid",
-        gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(3,1fr)",
-        gap: isMobile ? "12px" : "20px"
-      }}>
-        {PHOTOS.map((src,i) => (
-          <div key={i} style={{ borderRadius: "16px", overflow: "hidden", boxShadow: "0 8px 32px rgba(255,0,80,0.3)" }}>
-            <img src={src} alt={`grid-${i}`} style={{ width: "100%", height: "auto", display: "block" }} />
-          </div>
-        ))}
-        {QUOTES.map((q,i) => (
-          <div key={`q-${i}`} style={{
-            background: "rgba(255,255,255,0.15)",
-            backdropFilter: "blur(8px)",
-            padding: "8px 12px",
-            borderRadius: "12px",
-            textAlign: "center",
-            color: "white",
-            fontWeight: 600,
-            fontSize: isMobile ? "12px" : "16px",
-            textShadow: "0 0 8px rgba(255,100,150,0.9)"
-          }}>
-            {q}
-          </div>
-        ))}
-      </div>
     </div>
   );
 };
@@ -360,7 +416,9 @@ export default function ReelCinematicValentine() {
   const audioRef = useRef(null);
 
   useEffect(() => {
-    if (accepted && audioRef.current) audioRef.current.play().catch(() => {});
+    if (accepted && audioRef.current) {
+      audioRef.current.play().catch(() => {});
+    }
   }, [accepted]);
 
   return (
@@ -370,3 +428,5 @@ export default function ReelCinematicValentine() {
     </>
   );
 }
+
+
