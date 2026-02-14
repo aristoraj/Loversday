@@ -97,11 +97,7 @@ const PHOTOS = [
 // ================= HELPERS =================
 const random = (min, max) => Math.random() * (max - min) + min;
 
-// ================= RESPONSIVE LANES =================
-const DESKTOP_LANES = [10, 30, 50, 70, 90];
-const MOBILE_LANES_PHOTO = [15, 45, 75];
-const MOBILE_LANES_TEXT = [5, 50, 95];
-
+// ================= RESPONSIVE =================
 const useIsMobile = () => {
   const [isMobile, setIsMobile] = useState(
     typeof window !== "undefined" ? window.innerWidth < 768 : true
@@ -144,112 +140,35 @@ const Heart = ({ delay, reduceMotion, isMobile }) => (
   </motion.div>
 );
 
-// ================= FLOATING PHOTO (DESKTOP) =================
-const FloatingPhoto = ({ src, laneIndex, delay, lanes, isMobile, reduceMotion }) => {
-  const safeLeft = lanes[laneIndex];
-  const mobileOffset = isMobile ? random(-2, 2) : random(-4, 4);
-
-  return (
-    <motion.img
-      src={src}
-      initial={{ y: "110vh", opacity: 0 }}
-      animate={
-        reduceMotion
-          ? { opacity: [0, 1, 0] }
-          : { y: "-15vh", opacity: [0, 1, 1, 0] }
-      }
-      transition={{
-        duration: reduceMotion ? random(8, 11) : random(14, 20),
-        delay,
-        repeat: Infinity,
-        ease: "easeInOut"
-      }}
-      style={{
-        position: "absolute",
-        left: `${safeLeft + mobileOffset}%`,
-        transform: "translateX(-50%)",
-        width: isMobile ? "85px" : "140px",
-        height: isMobile ? "120px" : "175px",
-        objectFit: "cover",
-        borderRadius: "16px",
-        boxShadow: "0 10px 34px rgba(255,0,80,0.28)",
-        pointerEvents: "none",
-        zIndex: 3
-      }}
-    />
-  );
-};
-
-// ================= FLOATING QUOTE (DESKTOP) =================
-const FloatingQuote = ({ text, laneIndex, delay, lanes, isMobile, reduceMotion }) => {
-  const safeLeft = lanes[laneIndex];
-  const mobileOffset = isMobile ? random(-1, 1) : random(-3, 3);
-
+// ================= PHOTO + QUOTE CARD =================
+const PhotoQuoteCard = ({ src, quote, i, reduceMotion }) => {
   return (
     <motion.div
-      initial={{ y: "110vh", opacity: 0 }}
-      animate={
-        reduceMotion
-          ? { opacity: [0, 1, 0] }
-          : { y: "-15vh", opacity: [0, 1, 1, 0] }
-      }
-      transition={{
-        duration: reduceMotion ? random(7, 10) : random(12, 18),
-        delay,
-        repeat: Infinity,
-        ease: "easeInOut"
-      }}
-      style={{
-        position: "absolute",
-        left: `${safeLeft + mobileOffset}%`,
-        transform: "translateX(-50%)",
-        maxWidth: isMobile ? "110px" : "170px",
-        padding: isMobile ? "6px 10px" : "8px 14px",
-        textAlign: "center",
-        color: "white",
-        fontSize: isMobile ? "12px" : "16px",
-        fontWeight: 700,
-        lineHeight: 1.25,
-        textShadow: "0 0 14px rgba(255,100,150,0.9)",
-        pointerEvents: "none",
-        zIndex: 4,
-        background: "rgba(255,255,255,0.14)",
-        borderRadius: "10px",
-        backdropFilter: "blur(10px)",
-        border: "1px solid rgba(255,255,255,0.18)"
-      }}
-    >
-      {text}
-    </motion.div>
-  );
-};
-
-// ================= GRID (MOBILE) PHOTO CARD =================
-const GridPhotoCard = ({ src, i, reduceMotion }) => {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 8, scale: 0.98 }}
+      initial={{ opacity: 0, y: 10, scale: 0.98 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{
         duration: reduceMotion ? 0.15 : 0.45,
-        delay: reduceMotion ? 0 : Math.min(i * 0.03, 0.6),
+        delay: reduceMotion ? 0 : Math.min(i * 0.02, 0.6),
         ease: "easeOut"
       }}
       style={{
         width: "100%",
-        borderRadius: 16,
+        borderRadius: 18,
         overflow: "hidden",
-        boxShadow: "0 10px 30px rgba(255,0,80,0.20)",
+        boxShadow: "0 10px 30px rgba(255,0,80,0.16)",
         border: "1px solid rgba(255,255,255,0.18)",
-        background: "rgba(255,255,255,0.08)"
+        background: "rgba(255,255,255,0.10)"
       }}
     >
       <motion.img
         src={src}
         alt={`photo-${i + 1}`}
-        initial={false}
         animate={reduceMotion ? {} : { y: [0, -2, 0] }}
-        transition={reduceMotion ? {} : { duration: random(3.2, 4.8), repeat: Infinity, ease: "easeInOut" }}
+        transition={
+          reduceMotion
+            ? {}
+            : { duration: random(3.0, 4.6), repeat: Infinity, ease: "easeInOut" }
+        }
         style={{
           display: "block",
           width: "100%",
@@ -257,42 +176,28 @@ const GridPhotoCard = ({ src, i, reduceMotion }) => {
           objectFit: "cover"
         }}
       />
-    </motion.div>
-  );
-};
 
-// ================= GRID (MOBILE) QUOTE CARD =================
-const GridQuoteCard = ({ text, i, reduceMotion }) => {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 10, scale: 0.98 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{
-        duration: reduceMotion ? 0.15 : 0.4,
-        delay: reduceMotion ? 0 : Math.min(i * 0.02, 0.6),
-        ease: "easeOut"
-      }}
-      style={{
-        padding: "12px 12px",
-        borderRadius: 14,
-        background: "rgba(255, 105, 140, 0.22)",
-        backdropFilter: "blur(12px)",
-        border: "1px solid rgba(255,255,255,0.18)",
-        boxShadow: "0 10px 30px rgba(0,0,0,0.12)",
-        color: "white",
-        fontWeight: 800,
-        fontSize: "13px",
-        lineHeight: 1.25,
-        textAlign: "center",
-        textShadow: "0 0 12px rgba(255,50,120,0.8)"
-      }}
-    >
       <motion.div
-        initial={false}
-        animate={reduceMotion ? {} : { scale: [1, 1.02, 1] }}
-        transition={reduceMotion ? {} : { duration: random(2.8, 4.2), repeat: Infinity, ease: "easeInOut" }}
+        animate={reduceMotion ? {} : { scale: [1, 1.015, 1] }}
+        transition={
+          reduceMotion
+            ? {}
+            : { duration: random(2.8, 4.2), repeat: Infinity, ease: "easeInOut" }
+        }
+        style={{
+          padding: "12px 10px",
+          textAlign: "center",
+          color: "white",
+          fontWeight: 800,
+          fontSize: "clamp(12px, 1.4vw, 16px)",
+          lineHeight: 1.2,
+          textShadow: "0 0 12px rgba(255,50,120,0.75)",
+          background: "rgba(255, 105, 140, 0.18)",
+          backdropFilter: "blur(10px)",
+          borderTop: "1px solid rgba(255,255,255,0.14)"
+        }}
       >
-        {text}
+        {quote}
       </motion.div>
     </motion.div>
   );
@@ -305,23 +210,25 @@ const FrontPage = ({ onYes }) => {
   const reduceMotion = useReducedMotion();
 
   const moveNo = () => {
-    // smaller movement on mobile to avoid going off screen / accidental taps
     const x = isMobile ? random(-50, 50) : random(-100, 100);
     const y = isMobile ? random(-25, 25) : random(-50, 50);
     setNoPos({ x, y });
   };
 
   return (
-    <div style={{
-      height: "100vh",
-      width: "100vw",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      background: "linear-gradient(135deg, #f6c1cc 0%, #ffd4e0 50%, #f6c1cc 100%)",
-      position: "relative",
-      overflow: "hidden"
-    }}>
+    <div
+      style={{
+        height: "100vh",
+        width: "100vw",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        background:
+          "linear-gradient(135deg, #f6c1cc 0%, #ffd4e0 50%, #f6c1cc 100%)",
+        position: "relative",
+        overflow: "hidden"
+      }}
+    >
       {Array.from({ length: isMobile ? 10 : 15 }).map((_, i) => (
         <motion.div
           key={i}
@@ -358,7 +265,8 @@ const FrontPage = ({ onYes }) => {
           padding: isMobile ? "26px 18px" : "32px 26px",
           borderRadius: "28px",
           textAlign: "center",
-          boxShadow: "0 25px 70px rgba(255, 0, 80, 0.25), 0 10px 30px rgba(0, 0, 0, 0.1)",
+          boxShadow:
+            "0 25px 70px rgba(255, 0, 80, 0.25), 0 10px 30px rgba(0, 0, 0, 0.1)",
           maxWidth: "92vw",
           width: "fit-content",
           border: "3px solid rgba(255, 100, 150, 0.3)",
@@ -394,30 +302,29 @@ const FrontPage = ({ onYes }) => {
           }}
         />
 
-        <h2 style={{
-          color: "#ff4d88",
-          fontSize: "clamp(18px, 5vw, 24px)",
-          margin: "0 0 12px 0",
-          textShadow: "0 2px 10px rgba(255, 77, 136, 0.3)"
-        }}>
+        <h2
+          style={{
+            color: "#ff4d88",
+            fontSize: "clamp(18px, 5vw, 24px)",
+            margin: "0 0 12px 0",
+            textShadow: "0 2px 10px rgba(255, 77, 136, 0.3)"
+          }}
+        >
           My dr Manje🐣😻,
         </h2>
 
-        <h1 style={{
-          color: "#333",
-          marginBottom: 20,
-          fontSize: "clamp(22px, 6vw, 32px)",
-          fontWeight: 800
-        }}>
+        <h1
+          style={{
+            color: "#333",
+            marginBottom: 20,
+            fontSize: "clamp(22px, 6vw, 32px)",
+            fontWeight: 800
+          }}
+        >
           Will you be my Valentine? 💖
         </h1>
 
-        <div style={{
-          display: "flex",
-          gap: 14,
-          justifyContent: "center",
-          flexWrap: "wrap"
-        }}>
+        <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
           <motion.button
             onClick={onYes}
             whileHover={reduceMotion ? {} : { scale: 1.07 }}
@@ -474,155 +381,167 @@ const FrontPage = ({ onYes }) => {
   );
 };
 
-// ================= REEL PAGE =================
+// ================= REEL PAGE (AUTO-FLOATING GRID, NO SCROLL) =================
 const ReelPage = () => {
   const [hearts, setHearts] = useState([]);
   const isMobile = useIsMobile();
   const reduceMotion = useReducedMotion();
 
-  const photoLanes = isMobile ? MOBILE_LANES_PHOTO : DESKTOP_LANES;
-  const textLanes = isMobile ? MOBILE_LANES_TEXT : DESKTOP_LANES;
+  // Pair every photo with a quote (loops quotes if photos > quotes)
+  const items = useMemo(
+    () => PHOTOS.map((src, i) => ({ src, quote: QUOTES[i % QUOTES.length] })),
+    []
+  );
+
+  // For seamless looping, we render the grid twice and translate upward
+  const gridMeasureRef = useRef(null);
+  const [loopHeight, setLoopHeight] = useState(1200);
 
   useEffect(() => {
     const count = isMobile ? 14 : 22;
-    setHearts(Array.from({ length: count }).map((_, i) => ({
-      id: i,
-      delay: random(0, 7)
-    })));
+    setHearts(
+      Array.from({ length: count }).map((_, i) => ({ id: i, delay: random(0, 7) }))
+    );
   }, [isMobile]);
 
-  const pairedQuotes = useMemo(() => {
-    // keep ALL quotes; we’ll show them in grid (2 columns) as-is
-    return QUOTES;
+  useEffect(() => {
+    const measure = () => {
+      if (!gridMeasureRef.current) return;
+      const h = gridMeasureRef.current.getBoundingClientRect().height;
+      setLoopHeight(Math.max(600, Math.floor(h)));
+    };
+
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
   }, []);
 
+  // Speed: adjust for mobile so it feels smooth
+  const duration = reduceMotion ? 0 : isMobile ? 22 : 28;
+
   return (
-    <div style={{
-      height: "100vh",
-      width: "100vw",
-      overflow: "hidden",
-      position: "relative",
-      background: "#f6c1cc"
-    }}>
-      {/* Hearts layer */}
-      <div style={{ position: "absolute", inset: 0, zIndex: 2 }}>
-        {hearts.map(h => (
-          <Heart
-            key={h.id}
-            delay={h.delay}
-            reduceMotion={reduceMotion}
-            isMobile={isMobile}
-          />
+    <div
+      style={{
+        height: "100vh",
+        width: "100vw",
+        overflow: "hidden",
+        position: "relative",
+        background: "#f6c1cc"
+      }}
+    >
+      {/* Hearts background */}
+      <div style={{ position: "absolute", inset: 0, zIndex: 1 }}>
+        {hearts.map((h) => (
+          <Heart key={h.id} delay={h.delay} reduceMotion={reduceMotion} isMobile={isMobile} />
         ))}
       </div>
 
-      {/* ================= DESKTOP: floating cinematic lanes ================= */}
-      {!isMobile && (
-        <>
-          {/* Photos layer */}
-          <div style={{ position: "absolute", inset: 0, zIndex: 3 }}>
-            {PHOTOS.map((p, i) => (
-              <FloatingPhoto
-                key={i}
-                src={p}
-                laneIndex={i % photoLanes.length}
-                delay={i * 1.8}
-                lanes={photoLanes}
-                isMobile={isMobile}
-                reduceMotion={reduceMotion}
-              />
-            ))}
-          </div>
-
-          {/* Quotes layer */}
-          <div style={{ position: "absolute", inset: 0, zIndex: 4 }}>
-            {QUOTES.map((q, i) => (
-              <FloatingQuote
-                key={i}
-                text={q}
-                laneIndex={(i + 1) % textLanes.length}
-                delay={i * 2.4}
-                lanes={textLanes}
-                isMobile={isMobile}
-                reduceMotion={reduceMotion}
-              />
-            ))}
-          </div>
-        </>
-      )}
-
-      {/* ================= MOBILE: grid layout (no overlap) ================= */}
-      {isMobile && (
-        <div style={{
+      {/* Floating grid layer (no scroll) */}
+      <div
+        style={{
           position: "absolute",
           inset: 0,
           zIndex: 5,
-          padding: "14px 12px 18px",
-          overflowY: "auto",
-          WebkitOverflowScrolling: "touch"
-        }}>
-          {/* Spacer so overlay message doesn’t block grid */}
-          <div style={{ height: "210px" }} />
-
-          {/* Photos Grid */}
-          <div style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
-            gap: 10,
-            alignItems: "stretch",
-            marginBottom: 14
-          }}>
-            {PHOTOS.map((src, i) => (
-              <GridPhotoCard key={`gp-${i}`} src={src} i={i} reduceMotion={reduceMotion} />
-            ))}
-          </div>
-
-          {/* Quotes Grid */}
-          <div style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
-            gap: 10,
-            alignItems: "stretch",
-            paddingBottom: 20
-          }}>
-            {pairedQuotes.map((q, i) => (
-              <GridQuoteCard key={`gq-${i}`} text={q} i={i} reduceMotion={reduceMotion} />
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Message overlay (kept, but safer on mobile) */}
-      <motion.div
-        initial={{ opacity: 0, y: 18 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.75, delay: 0.6, ease: "easeOut" }}
-        style={{
-          position: "absolute",
-          top: 14,
-          left: "50%",
-          transform: "translateX(-50%)",
-          width: "94%",
-          maxWidth: "560px",
-          maxHeight: isMobile ? "190px" : "60vh",
-          overflow: "auto",
-          WebkitOverflowScrolling: "touch",
-          textAlign: "center",
-          color: "white",
-          fontWeight: 700,
-          fontSize: "clamp(13px, 3.6vw, 18px)",
-          lineHeight: 1.5,
-          textShadow: "0 0 15px rgba(255,50,120,0.9)",
-          zIndex: 10,
-          padding: isMobile ? "14px 14px" : "20px 20px",
-          borderRadius: 20,
-          background: "rgba(255, 105, 140, 0.24)",
-          backdropFilter: "blur(12px)",
-          boxShadow: "0 10px 40px rgba(0,0,0,0.18)",
-          border: "1px solid rgba(255,255,255,0.18)"
+          padding: isMobile ? "14px 12px" : "18px 20px",
+          paddingTop: isMobile ? 140 : 120
         }}
       >
-        <div style={{ whiteSpace: "pre-wrap" }}>{YES_MESSAGE}</div>
+        <motion.div
+          animate={reduceMotion ? {} : { y: [0, -loopHeight] }}
+          transition={
+            reduceMotion ? {} : { duration, repeat: Infinity, ease: "linear" }
+          }
+          style={{ willChange: "transform" }}
+        >
+          {/* FIRST GRID (measured) */}
+          <div ref={gridMeasureRef}>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: isMobile
+                  ? "repeat(2, minmax(0, 1fr))"
+                  : "repeat(4, minmax(0, 1fr))",
+                gap: isMobile ? 10 : 14,
+                alignItems: "stretch"
+              }}
+            >
+              {items.map((it, i) => (
+                <PhotoQuoteCard
+                  key={`card-a-${i}`}
+                  src={it.src}
+                  quote={it.quote}
+                  i={i}
+                  reduceMotion={reduceMotion}
+                />
+              ))}
+            </div>
+
+            <div style={{ height: isMobile ? 12 : 16 }} />
+          </div>
+
+          {/* SECOND GRID (duplicate for seamless loop) */}
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: isMobile
+                ? "repeat(2, minmax(0, 1fr))"
+                : "repeat(4, minmax(0, 1fr))",
+              gap: isMobile ? 10 : 14,
+              alignItems: "stretch"
+            }}
+          >
+            {items.map((it, i) => (
+              <PhotoQuoteCard
+                key={`card-b-${i}`}
+                src={it.src}
+                quote={it.quote}
+                i={i}
+                reduceMotion={reduceMotion}
+              />
+            ))}
+          </div>
+        </motion.div>
+      </div>
+
+      {/* YES message centered */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.96 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+        style={{
+          position: "absolute",
+          inset: 0,
+          zIndex: 1,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          pointerEvents: "none"
+        }}
+      >
+        <div
+          style={{
+            width: "92%",
+            maxWidth: "620px",
+            maxHeight: isMobile ? "60vh" : "70vh",
+            overflow: "auto",
+            WebkitOverflowScrolling: "touch",
+            textAlign: "center",
+            color: "white",
+            fontWeight: 700,
+            fontSize: "clamp(13px, 3.6vw, 18px)",
+            lineHeight: 1.5,
+            textShadow: "0 0 15px rgba(255,50,120,0.9)",
+            padding: isMobile ? "16px 16px" : "20px 20px",
+            borderRadius: 22,
+            background: "rgba(255, 105, 140, 0.26)",
+            backdropFilter: "blur(12px)",
+            boxShadow: "0 12px 50px rgba(0,0,0,0.22)",
+            border: "1px solid rgba(255,255,255,0.20)",
+            pointerEvents: "auto"
+          }}
+        >
+          <div style={{ whiteSpace: "pre-wrap" }}>{YES_MESSAGE}</div>
+        </div>
       </motion.div>
     </div>
   );
