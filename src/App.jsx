@@ -475,7 +475,7 @@ const ReelPage = () => {
         <div
           style={{
             position: "absolute",
-            top: 86,
+            top: 90,
             right: 14,
             zIndex: 999,
             pointerEvents: "auto"
