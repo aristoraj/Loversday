@@ -133,6 +133,7 @@ Happy Valantine's day dii Thangame🤍🫰💃❤️
 💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋
 💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋
 💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋
+💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋
 💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋`;
 
 import bgMusic from "./assets/music.mp3";
@@ -522,8 +523,14 @@ const ReelPage = () => {
   const canAnimateFloat = !reduceMotion && startFloat && !(isMobile && isPaused);
   const floatY = canAnimateFloat ? [0, -loopHeight] : 0;
 
+  // ✅ screen tap to pause/play (mobile only) — same as old pause button action
+  const handleScreenTogglePause = () => {
+    if (isMobile && !reduceMotion) setIsPaused((p) => !p);
+  };
+
   return (
     <div
+      onClick={handleScreenTogglePause}
       style={{
         height: "100vh",
         width: "100vw",
@@ -623,71 +630,50 @@ const ReelPage = () => {
       </div>
 
       {/* YES message (TOP center aligned) */}
-<motion.div
-  initial={{ opacity: 0, y: -10, scale: 0.98 }}
-  animate={{ opacity: 1, y: 0, scale: 1 }}
-  transition={{ duration: 0.6, ease: "easeOut" }}
-  style={{
-    position: "absolute",
-    top: 18,
-    left: "5%",
-    transform: "translateX(-50%)",
-    zIndex: 1, // make sure it's above grid
-    width: "92%",
-    maxWidth: "640px",
-    pointerEvents: "auto" // ✅ allow clicking inside
-  }}
->
-  {/* Container */}
-  <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-    {/* Scrollable message box */}
-    <div
-      ref={messageRef}
-      style={{
-        maxHeight: isMobile ? "100vh" : "46vh",
-        overflow: "auto",
-        WebkitOverflowScrolling: "touch",
-        textAlign: "center",
-        color: "white",
-        fontWeight: 700,
-        fontSize: "clamp(13px, 3.6vw, 18px)",
-        lineHeight: 1.5,
-        textShadow: "0 0 15px rgba(255,50,120,0.9)",
-        padding: isMobile ? "14px 14px" : "18px 18px",
-        borderRadius: 22,
-        background: "rgba(255, 105, 140, 0.30)",
-        backdropFilter: "blur(12px)",
-        boxShadow: "0 12px 50px rgba(0,0,0,0.20)",
-        border: "1px solid rgba(255,255,255,0.20)"
-      }}
-    >
-      <div style={{ whiteSpace: "pre-wrap" }}>{YES_MESSAGE}</div>
-    </div>
+      <motion.div
+        initial={{ opacity: 0, y: -10, scale: 0.98 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+        style={{
+          position: "absolute",
+          top: 18,
+          left: "5%",
+          transform: "translateX(-50%)",
+          zIndex: 1, // make sure it's above grid
+          width: "92%",
+          maxWidth: "640px",
+          pointerEvents: "auto" // ✅ allow clicking inside
+        }}
+      >
+        {/* Container */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          {/* Scrollable message box */}
+          <div
+            ref={messageRef}
+            style={{
+              maxHeight: isMobile ? "100vh" : "46vh",
+              overflow: "auto",
+              WebkitOverflowScrolling: "touch",
+              textAlign: "center",
+              color: "white",
+              fontWeight: 700,
+              fontSize: "clamp(13px, 3.6vw, 18px)",
+              lineHeight: 1.5,
+              textShadow: "0 0 15px rgba(255,50,120,0.9)",
+              padding: isMobile ? "14px 14px" : "18px 18px",
+              borderRadius: 22,
+              background: "rgba(255, 105, 140, 0.30)",
+              backdropFilter: "blur(12px)",
+              boxShadow: "0 12px 50px rgba(0,0,0,0.20)",
+              border: "1px solid rgba(255,255,255,0.20)"
+            }}
+          >
+            <div style={{ whiteSpace: "pre-wrap" }}>{YES_MESSAGE}</div>
+          </div>
 
-    {/* ✅ Pause button BELOW message (always visible) */}
-    {isMobile && !reduceMotion && (
-      <div style={{ display: "flex", justifyContent: "center" }}>
-        <button
-          onClick={() => setIsPaused((p) => !p)}
-          style={{
-            border: "1px solid rgba(255,255,255,0.28)",
-            background: "rgba(255, 105, 140, 0.35)",
-            color: "white",
-            fontWeight: 800,
-            borderRadius: 14,
-            padding: "10px 14px",
-            backdropFilter: "blur(10px)",
-            boxShadow: "0 10px 30px rgba(0,0,0,0.18)",
-            cursor: "pointer"
-          }}
-        >
-          {isPaused ? "▶ Play" : "⏸ Pause"}
-        </button>
-      </div>
-    )}
-  </div>
-</motion.div>
-
+          {/* ✅ Pause button removed (screen tap handles pause/play) */}
+        </div>
+      </motion.div>
     </div>
   );
 };
