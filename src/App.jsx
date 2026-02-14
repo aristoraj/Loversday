@@ -98,10 +98,10 @@ const PHOTOS = [
 const random = (min, max) => Math.random() * (max - min) + min;
 
 // ================= RESPONSIVE LANES =================
-// Increased gaps for mobile to prevent overlap
-const DESKTOP_LANES = [10, 30, 50, 70, 90];
-const MOBILE_LANES_PHOTO = [15, 45, 75]; // Better spacing with more gap
-const MOBILE_LANES_TEXT = [5, 50, 95];   // Text lanes with safe margins
+// Fixed lanes to prevent overlap and stay within screen bounds
+const DESKTOP_LANES = [12, 28, 44, 60, 76, 88];
+const MOBILE_LANES_PHOTO = [18, 50, 82]; // Three clear lanes with proper spacing
+const MOBILE_LANES_TEXT = [10, 50, 90];   // Text lanes
 
 const useIsMobile = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
@@ -118,15 +118,26 @@ const useIsMobile = () => {
 // ================= HEART =================
 const Heart = ({ delay }) => (
   <motion.div
-    initial={{ y: "110vh", opacity: 0 }}
-    animate={{ y: "-10vh", opacity: [0,1,1,0] }}
-    transition={{ duration: random(6,10), delay, repeat: Infinity, ease: "linear" }}
+    initial={{ y: "110vh", opacity: 0, rotate: 0, scale: 0 }}
+    animate={{ 
+      y: "-10vh", 
+      opacity: [0, 1, 1, 1, 0],
+      rotate: [0, 10, -10, 10, 0],
+      scale: [0.8, 1.2, 1, 1.1, 0.9]
+    }}
+    transition={{ 
+      duration: random(8, 12), 
+      delay, 
+      repeat: Infinity, 
+      ease: "easeInOut" 
+    }}
     style={{
       position: "absolute",
-      left: `${random(0,100)}%`,
-      fontSize: `${random(16,28)}px`, // Slightly smaller hearts for mobile safety
+      left: `${random(5, 95)}%`,
+      fontSize: `${random(18, 32)}px`,
       pointerEvents: "none",
-      zIndex: 1
+      zIndex: 1,
+      filter: "drop-shadow(0 0 8px rgba(255, 100, 150, 0.6))"
     }}
   >
     ❤️
@@ -135,35 +146,41 @@ const Heart = ({ delay }) => (
 
 // ================= FLOATING PHOTO =================
 const FloatingPhoto = ({ src, laneIndex, delay, lanes, isMobile }) => {
-  const safeLeft = lanes[laneIndex];
-  const mobileOffset = isMobile ? random(-2,2) : random(-4,4); // Reduced random offset for mobile
+  const baseLane = lanes[laneIndex];
   
   return (
     <motion.img
       src={src}
-      initial={{ y: "110vh", opacity: 0 }}
+      initial={{ 
+        y: "110vh", 
+        opacity: 0,
+        scale: 0.7,
+        rotate: random(-15, 15)
+      }}
       animate={{ 
-        y: "-15vh", // Slightly less travel to stay in viewport
-        opacity: [0,1,1,0] 
+        y: "-20vh",
+        opacity: [0, 1, 1, 1, 0],
+        scale: [0.7, 1.05, 1, 1, 0.8],
+        rotate: [random(-15, 15), random(-8, 8), 0, random(-5, 5), random(-10, 10)]
       }}
       transition={{ 
-        duration: random(14,20), // Slightly slower for smoother mobile
+        duration: random(16, 22),
         delay, 
         repeat: Infinity, 
-        ease: "easeInOut" // Smoother easing
+        ease: "easeInOut"
       }}
       style={{
         position: "absolute",
-        left: `${safeLeft + mobileOffset}%`,
+        left: isMobile ? `${baseLane}%` : `${baseLane}%`,
         transform: "translateX(-50%)",
-        width: isMobile ? "85px" : "140px", // Smaller images for mobile
-        height: isMobile ? "120px" : "175px",
-        maxWidth: isMobile ? "90vw" : "none",
+        width: isMobile ? "75px" : "140px",
+        height: isMobile ? "105px" : "175px",
         objectFit: "cover",
-        borderRadius: "16px",
-        boxShadow: "0 8px 32px rgba(255,0,80,0.3)",
+        borderRadius: isMobile ? "12px" : "16px",
+        boxShadow: "0 12px 40px rgba(255, 0, 80, 0.4), 0 0 20px rgba(255, 100, 150, 0.3)",
         pointerEvents: "none",
-        zIndex: 3
+        zIndex: 3,
+        border: "2px solid rgba(255, 255, 255, 0.3)"
       }}
     />
   );
@@ -171,39 +188,49 @@ const FloatingPhoto = ({ src, laneIndex, delay, lanes, isMobile }) => {
 
 // ================= FLOATING QUOTE =================
 const FloatingQuote = ({ text, laneIndex, delay, lanes, isMobile }) => {
-  const safeLeft = lanes[laneIndex];
-  const mobileOffset = isMobile ? random(-1,1) : random(-3,3); // Minimal offset for mobile
+  const baseLane = lanes[laneIndex];
   
   return (
     <motion.div
-      initial={{ y: "110vh", opacity: 0 }}
+      initial={{ 
+        y: "110vh", 
+        opacity: 0,
+        scale: 0.5,
+        rotate: random(-10, 10)
+      }}
       animate={{ 
-        y: "-15vh", // Same travel distance as photos
-        opacity: [0,1,1,0] 
+        y: "-20vh",
+        opacity: [0, 0.9, 1, 1, 0],
+        scale: [0.5, 1.1, 1, 1, 0.7],
+        rotate: [random(-10, 10), random(-5, 5), 0, random(-3, 3), random(-8, 8)]
       }}
       transition={{ 
-        duration: random(12,18), // Synchronized timing range
+        duration: random(14, 20),
         delay, 
         repeat: Infinity, 
-        ease: "easeInOut" 
+        ease: "easeInOut"
       }}
       style={{
         position: "absolute",
-        left: `${safeLeft + mobileOffset}%`,
+        left: `${baseLane}%`,
         transform: "translateX(-50%)",
-        maxWidth: isMobile ? "100px" : "160px", // Much smaller for mobile
-        padding: isMobile ? "4px 8px" : "6px 12px",
+        maxWidth: isMobile ? "90px" : "160px",
+        padding: isMobile ? "6px 10px" : "8px 14px",
         textAlign: "center",
         color: "white",
-        fontSize: isMobile ? "12px" : "16px", // Smaller font for mobile
-        fontWeight: 600,
-        lineHeight: 1.3,
-        textShadow: "0 0 12px rgba(255,100,150,0.9)",
+        fontSize: isMobile ? "11px" : "16px",
+        fontWeight: 700,
+        lineHeight: 1.4,
+        textShadow: "0 0 15px rgba(255, 100, 150, 1), 0 2px 10px rgba(255, 0, 80, 0.8)",
         pointerEvents: "none",
         zIndex: 4,
-        background: isMobile ? "rgba(255,255,255,0.15)" : "transparent",
-        borderRadius: "8px",
-        backdropFilter: "blur(8px)"
+        background: isMobile 
+          ? "linear-gradient(135deg, rgba(255, 100, 150, 0.3), rgba(255, 50, 120, 0.25))"
+          : "rgba(255, 255, 255, 0.08)",
+        borderRadius: isMobile ? "10px" : "12px",
+        backdropFilter: "blur(10px)",
+        border: "1px solid rgba(255, 255, 255, 0.2)",
+        boxShadow: "0 4px 15px rgba(255, 0, 80, 0.3)"
       }}
     >
       {text}
@@ -216,7 +243,7 @@ const FrontPage = ({ onYes }) => {
   const [noPos, setNoPos] = useState({ x: 0, y: 0 });
 
   const moveNo = () => {
-    setNoPos({ x: random(-120,120), y: random(-60,60) }); // Reduced movement range
+    setNoPos({ x: random(-100, 100), y: random(-50, 50) });
   };
 
   return (
@@ -226,20 +253,28 @@ const FrontPage = ({ onYes }) => {
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
-      background: "#f6c1cc",
+      background: "linear-gradient(135deg, #f6c1cc 0%, #ffd4e0 50%, #f6c1cc 100%)",
       position: "relative",
       overflow: "hidden"
     }}>
-      {Array.from({ length: 12 }).map((_, i) => ( // Reduced hearts for mobile performance
+      {Array.from({ length: 15 }).map((_, i) => (
         <motion.div
           key={i}
           initial={{ y: "110vh", opacity: 0 }}
-          animate={{ y: "-10vh", opacity: [0,1,1,0] }}
-          transition={{ duration: random(6,12), delay: i * 0.6, repeat: Infinity }}
+          animate={{ 
+            y: "-10vh", 
+            opacity: [0, 1, 1, 0],
+            rotate: [0, 360]
+          }}
+          transition={{ 
+            duration: random(7, 13), 
+            delay: i * 0.5, 
+            repeat: Infinity 
+          }}
           style={{ 
             position: "absolute", 
-            left: `${random(0,100)}%`, 
-            fontSize: `${random(16,26)}px`,
+            left: `${random(5, 95)}%`, 
+            fontSize: `${random(18, 30)}px`,
             zIndex: 1
           }}
         >
@@ -248,68 +283,123 @@ const FrontPage = ({ onYes }) => {
       ))}
 
       <motion.div
-        initial={{ scale: 0.8, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ duration: 0.8 }}
+        initial={{ scale: 0.7, opacity: 0, y: 20 }}
+        animate={{ scale: 1, opacity: 1, y: 0 }}
+        transition={{ 
+          duration: 1, 
+          type: "spring", 
+          stiffness: 100 
+        }}
         style={{
-          background: "#fff0f4",
-          padding: "30px 24px", // Responsive padding
-          borderRadius: "24px",
+          background: "linear-gradient(135deg, #fff0f4 0%, #ffe8f0 100%)",
+          padding: "32px 26px",
+          borderRadius: "28px",
           textAlign: "center",
-          boxShadow: "0 20px 60px rgba(0,0,0,0.15)",
+          boxShadow: "0 25px 70px rgba(255, 0, 80, 0.25), 0 10px 30px rgba(0, 0, 0, 0.1)",
           maxWidth: "90vw",
-          width: "fit-content"
+          width: "fit-content",
+          border: "3px solid rgba(255, 100, 150, 0.3)",
+          position: "relative",
+          zIndex: 10
         }}
       >
-        <img 
+        <motion.img 
           src={PHOTOS[0]} 
-          alt="thumb" 
+          alt="thumb"
+          initial={{ scale: 0.8, rotate: -5 }}
+          animate={{ 
+            scale: 1, 
+            rotate: 0,
+            boxShadow: [
+              "0 10px 30px rgba(255, 0, 80, 0.3)",
+              "0 15px 40px rgba(255, 0, 80, 0.5)",
+              "0 10px 30px rgba(255, 0, 80, 0.3)"
+            ]
+          }}
+          transition={{ 
+            duration: 2,
+            repeat: Infinity,
+            repeatType: "reverse"
+          }}
           style={{
-            width: "120px", // Smaller thumb
-            height: "160px",
+            width: "130px",
+            height: "170px",
             objectFit: "cover",
-            borderRadius: "16px",
-            marginBottom: "16px"
+            borderRadius: "18px",
+            marginBottom: "18px",
+            border: "3px solid rgba(255, 100, 150, 0.4)"
           }} 
         />
 
-        <h2 style={{ color: "#ff4d88", fontSize: "clamp(18px, 5vw, 24px)", margin: "0 0 12px 0" }}>
+        <h2 style={{ 
+          color: "#ff4d88", 
+          fontSize: "clamp(18px, 5vw, 24px)", 
+          margin: "0 0 12px 0",
+          textShadow: "0 2px 10px rgba(255, 77, 136, 0.3)"
+        }}>
           My dr Manje🐣😻,
         </h2>
         <h1 style={{ 
           color: "#333", 
-          marginBottom: 16,
-          fontSize: "clamp(22px, 6vw, 32px)"
+          marginBottom: 20,
+          fontSize: "clamp(22px, 6vw, 32px)",
+          fontWeight: 800
         }}>
           Will you be my Valentine? 💖
         </h1>
 
-        <div style={{ display: "flex", gap: 16, justifyContent: "center", flexWrap: "wrap" }}>
-          <button onClick={onYes} style={{
-            background: "#ff4d88",
-            color: "white",
-            border: "none",
-            padding: "12px 28px",
-            borderRadius: "12px",
-            fontSize: "clamp(16px, 4vw, 18px)",
-            cursor: "pointer",
-            minWidth: "80px"
-          }}>
-            YES
-          </button>
+        <div style={{ 
+          display: "flex", 
+          gap: 16, 
+          justifyContent: "center", 
+          flexWrap: "wrap" 
+        }}>
+          <motion.button 
+            onClick={onYes}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+            animate={{
+              boxShadow: [
+                "0 5px 20px rgba(255, 77, 136, 0.4)",
+                "0 8px 30px rgba(255, 77, 136, 0.7)",
+                "0 5px 20px rgba(255, 77, 136, 0.4)"
+              ]
+            }}
+            transition={{ 
+              duration: 1.5,
+              repeat: Infinity,
+              repeatType: "reverse"
+            }}
+            style={{
+              background: "linear-gradient(135deg, #ff4d88, #ff1f6f)",
+              color: "white",
+              border: "none",
+              padding: "14px 32px",
+              borderRadius: "14px",
+              fontSize: "clamp(16px, 4vw, 19px)",
+              cursor: "pointer",
+              minWidth: "90px",
+              fontWeight: 700,
+              textShadow: "0 2px 5px rgba(0, 0, 0, 0.3)"
+            }}
+          >
+            YES 💕
+          </motion.button>
 
           <motion.button
             onMouseEnter={moveNo}
+            onTouchStart={moveNo}
             animate={{ x: noPos.x, y: noPos.y }}
-            transition={{ type: "spring", stiffness: 200 }}
+            transition={{ type: "spring", stiffness: 300, damping: 15 }}
             style={{
               background: "#d0d0d0",
               border: "none",
-              padding: "12px 28px",
-              borderRadius: "12px",
-              fontSize: "clamp(16px, 4vw, 18px)",
+              padding: "14px 32px",
+              borderRadius: "14px",
+              fontSize: "clamp(16px, 4vw, 19px)",
               cursor: "pointer",
-              minWidth: "80px"
+              minWidth: "90px",
+              fontWeight: 600
             }}
           >
             NO
@@ -329,9 +419,9 @@ const ReelPage = () => {
   const textLanes = isMobile ? MOBILE_LANES_TEXT : DESKTOP_LANES;
 
   useEffect(() => {
-    setHearts(Array.from({ length: 20 }).map((_, i) => ({ // Reduced for mobile
+    setHearts(Array.from({ length: 25 }).map((_, i) => ({
       id: i,
-      delay: random(0,8)
+      delay: random(0, 10)
     })));
   }, []);
 
@@ -341,7 +431,7 @@ const ReelPage = () => {
       width: "100vw",
       overflow: "hidden",
       position: "relative",
-      background: "#f6c1cc"
+      background: "linear-gradient(135deg, #f6c1cc 0%, #ffd4e0 30%, #f6c1cc 70%, #ffb3c9 100%)"
     }}>
       {/* Hearts layer */}
       <div style={{ position: "absolute", inset: 0, zIndex: 2 }}>
@@ -355,7 +445,7 @@ const ReelPage = () => {
             key={i}
             src={p}
             laneIndex={i % photoLanes.length}
-            delay={i * 1.8}
+            delay={i * 2.2}
             lanes={photoLanes}
             isMobile={isMobile}
           />
@@ -369,39 +459,49 @@ const ReelPage = () => {
             key={i}
             text={q}
             laneIndex={(i + 1) % textLanes.length}
-            delay={i * 2.4}
+            delay={i * 2.8}
             lanes={textLanes}
             isMobile={isMobile}
           />
         ))}
       </div>
 
-      {/* Message overlay - mobile friendly */}
+      {/* Message overlay - enhanced */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 1 }}
+        initial={{ opacity: 0, y: 30, scale: 0.9 }}
+        animate={{ 
+          opacity: 1, 
+          y: 0, 
+          scale: 1 
+        }}
+        transition={{ 
+          duration: 1.2, 
+          delay: 1.5,
+          type: "spring",
+          stiffness: 100
+        }}
         style={{
           position: "absolute",
           top: "20px",
           left: "50%",
           transform: "translateX(-50%)",
           width: "92%",
-          maxWidth: "500px",
-          maxHeight: "60vh",
+          maxWidth: "520px",
+          maxHeight: "62vh",
           overflow: "auto",
           textAlign: "center",
           color: "white",
-          fontWeight: "600",
+          fontWeight: "700",
           fontSize: "clamp(13px, 3.5vw, 18px)",
-          lineHeight: 1.5,
-          textShadow: "0 0 15px rgba(255,50,120,0.9)",
+          lineHeight: 1.6,
+          textShadow: "0 0 20px rgba(255, 50, 120, 1), 0 3px 15px rgba(255, 0, 80, 0.9)",
           zIndex: 10,
-          padding: "20px 20px",
-          borderRadius: "20px",
-          background: "rgba(255, 105, 140, 0.22)",
-          backdropFilter: "blur(12px)",
-          boxShadow: "0 10px 40px rgba(0,0,0,0.2)"
+          padding: "24px 22px",
+          borderRadius: "24px",
+          background: "linear-gradient(135deg, rgba(255, 105, 140, 0.35), rgba(255, 50, 120, 0.25))",
+          backdropFilter: "blur(16px)",
+          boxShadow: "0 15px 50px rgba(255, 0, 80, 0.4), 0 5px 20px rgba(0, 0, 0, 0.2)",
+          border: "2px solid rgba(255, 255, 255, 0.3)"
         }}
       >
         <div>{YES_MESSAGE}</div>
