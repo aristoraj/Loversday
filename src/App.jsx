@@ -96,16 +96,13 @@ const PHOTOS = [
 
 // ================= HELPERS =================
 const random = (min, max) => Math.random() * (max - min) + min;
-
 const useIsMobile = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-
   useEffect(() => {
     const resize = () => setIsMobile(window.innerWidth < 768);
     window.addEventListener("resize", resize);
     return () => window.removeEventListener("resize", resize);
   }, []);
-
   return isMobile;
 };
 
@@ -127,14 +124,23 @@ const Heart = ({ delay }) => (
   </motion.div>
 );
 
+// ================= FLOATING IMAGE/QUOTE =================
+const FloatingGridItem = ({ children, index }) => (
+  <motion.div
+    initial={{ y: 20, opacity: 0 }}
+    animate={{ y: [-5,5,-5], opacity: [0,1,1,0] }} // subtle floating animation
+    transition={{ repeat: Infinity, duration: random(4,6), delay: index * 0.1, ease: "easeInOut" }}
+    style={{ width: "100%" }}
+  >
+    {children}
+  </motion.div>
+);
+
 // ================= FRONT PAGE =================
 const FrontPage = ({ onYes }) => {
   const [noPos, setNoPos] = useState({ x: 0, y: 0 });
-
-  const moveNo = () => {
-    setNoPos({ x: random(-120,120), y: random(-60,60) });
-  };
-
+  const moveNo = () => setNoPos({ x: random(-120,120), y: random(-60,60) });
+  
   return (
     <div style={{
       height: "100vh",
@@ -146,10 +152,7 @@ const FrontPage = ({ onYes }) => {
       position: "relative",
       overflow: "hidden"
     }}>
-      {Array.from({ length: 12 }).map((_, i) => (
-        <Heart key={i} delay={i * 0.6} />
-      ))}
-
+      {Array.from({ length: 12 }).map((_, i) => <Heart key={i} delay={i * 0.6} />)}
       <motion.div
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
@@ -178,11 +181,7 @@ const FrontPage = ({ onYes }) => {
         <h2 style={{ color: "#ff4d88", fontSize: "clamp(18px, 5vw, 24px)", margin: "0 0 12px 0" }}>
           My dr Manje🐣😻,
         </h2>
-        <h1 style={{ 
-          color: "#333", 
-          marginBottom: 16,
-          fontSize: "clamp(22px, 6vw, 32px)"
-        }}>
+        <h1 style={{ color: "#333", marginBottom: 16, fontSize: "clamp(22px, 6vw, 32px)" }}>
           Will you be my Valentine? 💖
         </h1>
 
@@ -196,9 +195,7 @@ const FrontPage = ({ onYes }) => {
             fontSize: "clamp(16px, 4vw, 18px)",
             cursor: "pointer",
             minWidth: "80px"
-          }}>
-            YES
-          </button>
+          }}>YES</button>
 
           <motion.button
             onMouseEnter={moveNo}
@@ -213,9 +210,7 @@ const FrontPage = ({ onYes }) => {
               cursor: "pointer",
               minWidth: "80px"
             }}
-          >
-            NO
-          </motion.button>
+          >NO</motion.button>
         </div>
       </motion.div>
     </div>
@@ -236,101 +231,85 @@ const ReelPage = () => {
       overflowY: "auto",
       position: "relative"
     }}>
-      {/* Hearts */}
-      {Array.from({ length: 20 }).map((_, i) => (
-        <Heart key={i} delay={random(0,8)} />
-      ))}
+      {/* Floating Hearts */}
+      {Array.from({ length: 20 }).map((_, i) => <Heart key={i} delay={random(0,8)} />)}
 
-      {/* Images Grid */}
-      <div style={{
-        display: "grid",
-        gridTemplateColumns: isMobile ? "1fr 1fr 1fr" : "repeat(3, 1fr)",
-        gap: isMobile ? "16px" : "24px",
-        marginBottom: "20px",
-        zIndex: 3,
-        position: "relative"
-      }}>
-        {PHOTOS.map((src, i) => (
-          <motion.img 
-            key={i}
-            src={src} 
-            alt={`img-${i}`}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.1 }}
-            style={{
-              width: "100%",
-              aspectRatio: "0.75",
-              objectFit: "cover",
-              borderRadius: "16px",
-              boxShadow: "0 8px 32px rgba(255,0,80,0.3)",
-              zIndex: 3
-            }}
-          />
-        ))}
-      </div>
-
-      {/* Quotes Grid */}
-      <div style={{
-        display: "grid",
-        gridTemplateColumns: isMobile ? "1fr 1fr 1fr" : "repeat(3, 1fr)",
-        gap: isMobile ? "12px" : "20px",
-        zIndex: 4,
-        position: "relative"
-      }}>
-        {QUOTES.map((q, i) => (
-          <motion.div
-            key={i}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.1 }}
-            style={{
-              background: "rgba(255,255,255,0.15)",
-              backdropFilter: "blur(8px)",
-              padding: isMobile ? "6px 8px" : "8px 12px",
-              textAlign: "center",
-              color: "#fff",
-              fontWeight: 600,
-              fontSize: isMobile ? "12px" : "16px",
-              borderRadius: "12px",
-              textShadow: "0 0 8px rgba(255,100,150,0.9)"
-            }}
-          >
-            {q}
-          </motion.div>
-        ))}
-      </div>
-
-      {/* Message Overlay */}
+      {/* Top Centered Message */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 1 }}
+        transition={{ duration: 0.8 }}
         style={{
-          position: "fixed",
-          bottom: "20px",
+          position: "sticky",
+          top: "20px",
           left: "50%",
           transform: "translateX(-50%)",
-          width: "92%",
           maxWidth: "500px",
-          maxHeight: "40vh",
-          overflow: "auto",
+          background: "rgba(255,105,140,0.22)",
+          backdropFilter: "blur(12px)",
+          borderRadius: "20px",
+          padding: "16px",
           textAlign: "center",
           color: "white",
-          fontWeight: "600",
-          fontSize: "clamp(13px, 3.5vw, 16px)",
-          lineHeight: 1.4,
+          fontWeight: 600,
+          fontSize: "clamp(13px,3.5vw,16px)",
+          lineHeight: 1.5,
           textShadow: "0 0 15px rgba(255,50,120,0.9)",
           zIndex: 10,
-          padding: "16px",
-          borderRadius: "20px",
-          background: "rgba(255, 105, 140, 0.22)",
-          backdropFilter: "blur(12px)",
-          boxShadow: "0 10px 40px rgba(0,0,0,0.2)"
+          marginBottom: "20px"
         }}
       >
         {YES_MESSAGE}
       </motion.div>
+
+      {/* Photos Grid with floating animation */}
+      <div style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(3,1fr)",
+        gap: isMobile ? "12px" : "20px",
+        marginBottom: "20px"
+      }}>
+        {PHOTOS.map((src,i) => (
+          <FloatingGridItem key={i} index={i}>
+            <img
+              src={src}
+              alt={`img-${i}`}
+              style={{
+                width: "100%",
+                aspectRatio: "0.75",
+                objectFit: "cover",
+                borderRadius: "16px",
+                boxShadow: "0 8px 32px rgba(255,0,80,0.3)"
+              }}
+            />
+          </FloatingGridItem>
+        ))}
+      </div>
+
+      {/* Quotes Grid with floating animation */}
+      <div style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(3,1fr)",
+        gap: isMobile ? "8px" : "16px"
+      }}>
+        {QUOTES.map((q,i) => (
+          <FloatingGridItem key={i} index={i}>
+            <div style={{
+              background: "rgba(255,255,255,0.15)",
+              backdropFilter: "blur(8px)",
+              padding: isMobile ? "6px 8px" : "8px 12px",
+              textAlign: "center",
+              color: "white",
+              fontWeight: 600,
+              fontSize: isMobile ? "12px" : "16px",
+              borderRadius: "12px",
+              textShadow: "0 0 8px rgba(255,100,150,0.9)"
+            }}>
+              {q}
+            </div>
+          </FloatingGridItem>
+        ))}
+      </div>
     </div>
   );
 };
@@ -341,9 +320,7 @@ export default function ReelCinematicValentine() {
   const audioRef = useRef(null);
 
   useEffect(() => {
-    if (accepted && audioRef.current) {
-      audioRef.current.play().catch(() => {});
-    }
+    if (accepted && audioRef.current) audioRef.current.play().catch(() => {});
   }, [accepted]);
 
   return (
