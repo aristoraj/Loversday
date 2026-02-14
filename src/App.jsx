@@ -77,11 +77,11 @@ Chellame 💋 Kunje 💋 Pattu ma love you 💋
 Ammu kutty en bujjli 💋 alagi 😍 ladde umma dii 💋
 Kunje 🫂 en alagu pondati 💋💋👀
 
-No words to describe my love for you dii kunje 💯💋🫂
+No words to describe my love for you dii kunje 💯🫂
 Love you more and more dii 🤍🫰💃❤️
 
 My life became more beautiful since the day you entered my life 💯🫂🤍
-Love you forever dii my dr alagu pondatiiiiii 💋💋💋
+Love you forever dii my dr alagu pondatiiiiii 💋💋
 Happy Valantine's day dii Thangame🤍🫰💃❤️
 💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋
 💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋
@@ -644,7 +644,7 @@ const ReelPage = () => {
     <div
       ref={messageRef}
       style={{
-        maxHeight: isMobile ? "40vh" : "46vh",
+        maxHeight: isMobile ? "100vh" : "46vh",
         overflow: "auto",
         WebkitOverflowScrolling: "touch",
         textAlign: "center",
