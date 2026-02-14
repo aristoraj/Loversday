@@ -345,7 +345,7 @@ const FrontPage = ({ onYes }) => {
         }}
       >
         <motion.img
-          src={PHOTOS[0]}
+          src={shuffledPhotos[0]}
           alt="thumb"
           initial={{ scale: 0.86, rotate: -4 }}
           animate={{
