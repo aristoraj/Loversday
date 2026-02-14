@@ -66,11 +66,12 @@ const QUOTES = [
   "You are my happy place",
   "You are my reason to smile",
   "You are my calm in chaos",
-  "You are my heart's favorite person",
+  "You are my heart’s favorite person",
   "You are my always"
 ];
 
-// ================= YES MESSAGE =================
+// ================= STATIC YES MESSAGE =================
+
 const YES_MESSAGE = `Aww 😻 You said yes 🫣😍
 I love you so much dii en thangame 💋
 Chellame 💋 Kunje 💋 Pattu ma love you 💋
@@ -82,11 +83,12 @@ Love you more and more dii 🤍🫰💃❤️
 
 My life became more beautiful since the day you entered my life 💯🫂🤍
 Love you forever dii my dr alagu pondatiiiiii 💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋💋
-Happy Valantine's day dii Thangame🤍🫰💃❤️`;
+Happy Valantine's day dii Thangame`;
 
+// ================= MUSIC =================
 import bgMusic from "./assets/music.mp3";
 
-// ================= PHOTOS =================
+// ================= PHOTO ARRAY =================
 const PHOTOS = [
   img1,img2,img3,img4,img5,img6,img7,img8,img9,img10,
   img11,img12,img13,img14,img15,img16,img17,img18,img19,img20,
@@ -96,28 +98,19 @@ const PHOTOS = [
 
 // ================= HELPERS =================
 const random = (min, max) => Math.random() * (max - min) + min;
-const useIsMobile = () => {
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-  useEffect(() => {
-    const resize = () => setIsMobile(window.innerWidth < 768);
-    window.addEventListener("resize", resize);
-    return () => window.removeEventListener("resize", resize);
-  }, []);
-  return isMobile;
-};
+const LANES = [10, 30, 50, 70, 90];
 
-// ================= HEART =================
+// ================= HEART PARTICLES =================
 const Heart = ({ delay }) => (
   <motion.div
     initial={{ y: "110vh", opacity: 0 }}
-    animate={{ y: "-10vh", opacity: [0,1,1,0] }}
-    transition={{ duration: random(6,10), delay, repeat: Infinity, ease: "linear" }}
+    animate={{ y: "-10vh", opacity: [0, 1, 1, 0] }}
+    transition={{ duration: random(6, 10), delay, repeat: Infinity, ease: "linear" }}
     style={{
       position: "absolute",
-      left: `${random(0,100)}%`,
-      fontSize: `${random(16,28)}px`,
-      pointerEvents: "none",
-      zIndex: 1
+      left: `${random(0, 100)}%`,
+      fontSize: `${random(16, 32)}px`,
+      pointerEvents: "none"
     }}
   >
     ❤️
@@ -125,85 +118,135 @@ const Heart = ({ delay }) => (
 );
 
 // ================= FLOATING PHOTO =================
-const FloatingPhoto = ({ src, laneIndex, delay, lanes, isMobile }) => {
-  const safeLeft = lanes[laneIndex];
-  const mobileOffset = isMobile ? random(-2,2) : random(-4,4); 
-  return (
-    <motion.img
-      src={src}
-      initial={{ y: "110vh", opacity: 0 }}
-      animate={{ y: "-15vh", opacity: [0,1,1,0] }}
-      transition={{ duration: random(14,20), delay, repeat: Infinity, ease: "easeInOut" }}
-      style={{
-        position: "absolute",
-        left: `${safeLeft + mobileOffset}%`,
-        transform: "translateX(-50%)",
-        width: isMobile ? "85px" : "140px",
-        height: isMobile ? "120px" : "175px",
-        maxWidth: isMobile ? "90vw" : "none",
-        objectFit: "cover",
-        borderRadius: "16px",
-        boxShadow: "0 8px 32px rgba(255,0,80,0.3)",
-        pointerEvents: "none",
-        zIndex: 3
-      }}
-    />
-  );
-};
+const FloatingPhoto = ({ src, laneIndex, delay }) => (
+  <motion.img
+    src={src}
+    initial={{ y: "110vh", opacity: 0 }}
+    animate={{ y: "-20vh", opacity: [0, 1, 1, 0] }}
+    transition={{ duration: random(12, 18), delay, repeat: Infinity, ease: "linear" }}
+    style={{
+      position: "absolute",
+      left: `${LANES[laneIndex]}%`,
+      transform: "translateX(-50%)",
+      width: "120px",
+      height: "160px",
+      objectFit: "cover",
+      borderRadius: "20px",
+      boxShadow: "0 0 30px rgba(255,0,80,0.4)",
+      pointerEvents: "none"
+    }}
+  />
+);
 
 // ================= FLOATING QUOTE =================
-const FloatingQuote = ({ text, laneIndex, delay, lanes, isMobile }) => {
-  const safeLeft = lanes[laneIndex];
-  const mobileOffset = isMobile ? random(-1,1) : random(-3,3);
-  return (
-    <motion.div
-      initial={{ y: "110vh", opacity: 0 }}
-      animate={{ y: "-15vh", opacity: [0,1,1,0] }}
-      transition={{ duration: random(12,18), delay, repeat: Infinity, ease: "easeInOut" }}
-      style={{
-        position: "absolute",
-        left: `${safeLeft + mobileOffset}%`,
-        transform: "translateX(-50%)",
-        maxWidth: isMobile ? "100px" : "160px",
-        padding: isMobile ? "4px 8px" : "6px 12px",
-        textAlign: "center",
-        color: "white",
-        fontSize: isMobile ? "12px" : "16px",
-        fontWeight: 600,
-        lineHeight: 1.3,
-        textShadow: "0 0 12px rgba(255,100,150,0.9)",
-        pointerEvents: "none",
-        zIndex: 4,
-        background: isMobile ? "rgba(255,255,255,0.15)" : "transparent",
-        borderRadius: "8px",
-        backdropFilter: "blur(8px)"
-      }}
-    >
-      {text}
-    </motion.div>
-  );
-};
+const FloatingQuote = ({ text, laneIndex, delay }) => (
+  <motion.div
+    initial={{ y: "110vh", opacity: 0 }}
+    animate={{ y: "-20vh", opacity: [0, 1, 1, 0] }}
+    transition={{ duration: random(10, 16), delay, repeat: Infinity, ease: "linear" }}
+    style={{
+      position: "absolute",
+      left: `${LANES[laneIndex]}%`,
+      transform: "translateX(-50%)",
+      maxWidth: "180px",
+      textAlign: "center",
+      color: "white",
+      fontSize: "18px",
+      fontWeight: 600,
+      textShadow: "0 0 15px rgba(255,100,150,0.9)",
+      pointerEvents: "none"
+    }}
+  >
+    {text}
+  </motion.div>
+);
 
 // ================= FRONT PAGE =================
 const FrontPage = ({ onYes }) => {
   const [noPos, setNoPos] = useState({ x: 0, y: 0 });
-  const moveNo = () => setNoPos({ x: random(-120,120), y: random(-60,60) });
+
+  const moveNo = () => {
+    setNoPos({ x: random(-150, 150), y: random(-80, 80) });
+  };
 
   return (
-    <div style={{ height:"100vh", width:"100vw", display:"flex", alignItems:"center", justifyContent:"center", background:"#f6c1cc", position:"relative", overflow:"hidden"}}>
-      {Array.from({length:12}).map((_,i)=><Heart key={i} delay={i*0.6} />)}
+    <div style={{
+      height: "100vh",
+      width: "100vw",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      background: "#f6c1cc",
+      position: "relative",
+      overflow: "hidden",
+      fontFamily: "sans-serif"
+    }}>
+      {Array.from({ length: 15 }).map((_, i) => (
+        <motion.div
+          key={i}
+          initial={{ y: "110vh", opacity: 0 }}
+          animate={{ y: "-10vh", opacity: [0, 1, 1, 0] }}
+          transition={{ duration: random(6, 12), delay: i * 0.5, repeat: Infinity }}
+          style={{ position: "absolute", left: `${random(0, 100)}%`, fontSize: `${random(18, 32)}px` }}
+        >
+          ❤️
+        </motion.div>
+      ))}
+
       <motion.div
         initial={{ scale: 0.8, opacity: 0 }}
-        animate={{ scale:1, opacity:1 }}
+        animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 0.8 }}
-        style={{ background:"#fff0f4", padding:"30px 24px", borderRadius:"24px", textAlign:"center", boxShadow:"0 20px 60px rgba(0,0,0,0.15)", maxWidth:"90vw", width:"fit-content" }}
+        style={{
+          background: "#fff0f4",
+          padding: "40px",
+          borderRadius: "30px",
+          textAlign: "center",
+          boxShadow: "0 20px 60px rgba(0,0,0,0.15)"
+        }}
       >
-        <img src={PHOTOS[0]} alt="thumb" style={{width:"120px", height:"160px", objectFit:"cover", borderRadius:"16px", marginBottom:"16px"}} />
-        <h2 style={{ color:"#ff4d88", fontSize:"clamp(18px,5vw,24px)", margin:"0 0 12px 0"}}>My dr Manje🐣😻,</h2>
-        <h1 style={{ color:"#333", marginBottom:16, fontSize:"clamp(22px,6vw,32px)" }}>Will you be my Valentine? 💖</h1>
-        <div style={{ display:"flex", gap:16, justifyContent:"center", flexWrap:"wrap" }}>
-          <button onClick={onYes} style={{ background:"#ff4d88", color:"white", border:"none", padding:"12px 28px", borderRadius:"12px", fontSize:"clamp(16px,4vw,18px)", cursor:"pointer", minWidth:"80px"}}>YES</button>
-          <motion.button onMouseEnter={moveNo} animate={{x:noPos.x, y:noPos.y}} transition={{type:"spring", stiffness:200}} style={{background:"#d0d0d0", border:"none", padding:"12px 28px", borderRadius:"12px", fontSize:"clamp(16px,4vw,18px)", cursor:"pointer", minWidth:"80px"}}>NO</motion.button>
+        <img src={PHOTOS[0]} alt="thumbnail" style={{
+          width: "140px",
+          height: "180px",
+          objectFit: "cover",
+          borderRadius: "18px",
+          marginBottom: "20px",
+          boxShadow: "0 10px 30px rgba(0,0,0,0.2)"
+        }} />
+
+        <h2 style={{ color: "#ff4d88" }}>My dr Manje🐣😻,</h2>
+        <h1 style={{ color: "#333", marginBottom: 20 }}>
+          Will you be my Valentine? 💖
+        </h1>
+
+        <div style={{ display: "flex", gap: 20, justifyContent: "center" }}>
+          <button onClick={onYes} style={{
+            background: "#ff4d88",
+            color: "white",
+            border: "none",
+            padding: "14px 30px",
+            borderRadius: "14px",
+            fontSize: "18px",
+            cursor: "pointer"
+          }}>
+            YES
+          </button>
+
+          <motion.button
+            onMouseEnter={moveNo}
+            animate={{ x: noPos.x, y: noPos.y }}
+            transition={{ type: "spring", stiffness: 200 }}
+            style={{
+              background: "#d0d0d0",
+              border: "none",
+              padding: "14px 30px",
+              borderRadius: "14px",
+              fontSize: "18px",
+              cursor: "pointer"
+            }}
+          >
+            NO
+          </motion.button>
         </div>
       </motion.div>
     </div>
@@ -212,41 +255,62 @@ const FrontPage = ({ onYes }) => {
 
 // ================= REEL PAGE =================
 const ReelPage = () => {
-  const isMobile = useIsMobile();
-  const photoLanes = [15,50,85];
-  const quoteLanes = [15,50,85];
-
   const [hearts, setHearts] = useState([]);
-  useEffect(()=>{
-    setHearts(Array.from({length:20}).map((_,i)=>({id:i,delay:random(0,8)})))
-  },[]);
+
+  useEffect(() => {
+    setHearts(Array.from({ length: 25 }).map((_, i) => ({
+      id: i,
+      delay: random(0, 8)
+    })));
+  }, []);
 
   return (
-    <div style={{ height:"100vh", width:"100vw", overflow:"hidden", position:"relative", background:"#f6c1cc" }}>
-      
-      {/* Hearts */}
-      <div style={{position:"absolute", inset:0, zIndex:1}}>{hearts.map(h=><Heart key={h.id} delay={h.delay}/>)}</div>
-
-      {/* Floating Photos */}
-      <div style={{position:"absolute", inset:0, zIndex:2}}>
-        {PHOTOS.map((p,i)=><FloatingPhoto key={i} src={p} laneIndex={i%photoLanes.length} delay={i*1.5} lanes={photoLanes} isMobile={isMobile} />)}
+    <div style={{
+      height: "100vh",
+      width: "100vw",
+      overflow: "hidden",
+      position: "relative",
+      background: "#f6c1cc",
+      fontFamily: "sans-serif"
+    }}>
+      <div style={{ position: "absolute", inset: 0, zIndex: 2 }}>
+        {hearts.map(h => <Heart key={h.id} delay={h.delay} />)}
       </div>
 
-      {/* Floating Quotes */}
-      <div style={{position:"absolute", inset:0, zIndex:3}}>
-        {QUOTES.map((q,i)=><FloatingQuote key={i} text={q} laneIndex={i%quoteLanes.length} delay={i*2} lanes={quoteLanes} isMobile={isMobile} />)}
+      <div style={{ position: "absolute", inset: 0, zIndex: 3 }}>
+        {PHOTOS.map((p, i) => (
+          <FloatingPhoto key={i} src={p} laneIndex={i % LANES.length} delay={i * 1.5} />
+        ))}
       </div>
 
-      {/* Top-center message */}
-      <motion.div
-        initial={{opacity:0, y:-30}}
-        animate={{opacity:1, y:0}}
-        transition={{duration:0.8, delay:0.5}}
-        style={{position:"absolute", top:"20px", left:"50%", transform:"translateX(-50%)", maxWidth:"500px", background:"rgba(255,105,140,0.22)", backdropFilter:"blur(12px)", borderRadius:"20px", padding:"20px", textAlign:"center", color:"white", fontWeight:600, fontSize:isMobile?"12px":"14px", lineHeight:1.5, textShadow:"0 0 15px rgba(255,50,120,0.9)", zIndex:10}}
-      >
+      <div style={{ position: "absolute", inset: 0, zIndex: 4 }}>
+        {QUOTES.map((q, i) => (
+          <FloatingQuote key={i} text={q} laneIndex={(i + 2) % LANES.length} delay={i * 2} />
+        ))}
+      </div>
+
+      {/* ===== STATIC LOVE TEXT ===== */}
+      <div style={{
+        position: "absolute",
+        top: "40px",
+        left: "50%",
+        transform: "translateX(-50%)",
+        width: "90%",
+        maxWidth: "500px",
+        textAlign: "center",
+        color: "white",
+        fontWeight: "bold",
+        fontSize: "clamp(16px, 4vw, 22px)",
+        lineHeight: 1.5,
+        textShadow: "0 0 20px rgba(255,50,120,0.9)",
+        zIndex: 1,
+        padding: "16px 18px",
+        borderRadius: "18px",
+        background: "rgba(255, 105, 140, 0.25)",
+        backdropFilter: "blur(6px)"
+      }}>
         {YES_MESSAGE}
-      </motion.div>
-
+      </div>
     </div>
   );
 };
@@ -255,13 +319,17 @@ const ReelPage = () => {
 export default function ReelCinematicValentine() {
   const [accepted, setAccepted] = useState(false);
   const audioRef = useRef(null);
-  useEffect(()=>{
-    if(accepted && audioRef.current) audioRef.current.play().catch(()=>{});
-  },[accepted]);
+
+  useEffect(() => {
+    if (accepted && audioRef.current) {
+      audioRef.current.play().catch(() => {});
+    }
+  }, [accepted]);
+
   return (
     <>
       <audio ref={audioRef} src={bgMusic} loop />
-      {accepted ? <ReelPage /> : <FrontPage onYes={()=>setAccepted(true)} />}
+      {accepted ? <ReelPage /> : <FrontPage onYes={() => setAccepted(true)} />}
     </>
   );
 }
