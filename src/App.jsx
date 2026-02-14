@@ -533,7 +533,7 @@ const ReelPage = () => {
       }}
     >
       {/* Hearts background */}
-      <div style={{ position: "absolute", inset: 0, zIndex: 1 }}>
+      <div style={{ position: "absolute", inset: 0, zIndex: 10 }}>
         {hearts.map((h) => (
           <Heart key={h.id} delay={h.delay} reduceMotion={reduceMotion} isMobile={isMobile} />
         ))}
@@ -632,7 +632,7 @@ const ReelPage = () => {
     top: 18,
     left: "5%",
     transform: "translateX(-50%)",
-    zIndex: 999, // make sure it's above grid
+    zIndex: 1, // make sure it's above grid
     width: "92%",
     maxWidth: "640px",
     pointerEvents: "auto" // ✅ allow clicking inside
